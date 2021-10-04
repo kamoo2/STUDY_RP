@@ -121,47 +121,58 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 var container = document.querySelector("#root"); // let : 새로운 값을 넣을 수 있음 const : 새로운 값을 넣을 수 없음 (상수)
 
 var ajax = new XMLHttpRequest();
-var content = document.createElement("div");
 var NEWS_URL = "https://api.hnpwa.com/v0/news/1.json"; // 여기서 @id는 마킹을 하는 하나의 방법으로 id부분은 연결된 a태그의 아이템에 따라 달라져야 하기 때문에 마킹을 걸어둔다.
 
 var CONTENT_URL = "https://api.hnpwa.com/v0/item/@id.json";
-ajax.open("GET", NEWS_URL, false);
-ajax.send(); // response탭은 문자열로 나와있기 때문에 일렬로 나와있어 보기 불편
-// preview탭을 보면 보기 훨씬 편한 것을 알 수 있다.
-// 그리고 자바스크립트도 데이터를 사용할 때 preview탭과 같은 데이터 구조를 더 사용하기 편하다.
-// JSON.parse : 문자열을 데이터를 json 형태로 변환
+var store = {
+  currentPage: 1
+};
 
-var newsFeed = JSON.parse(ajax.response);
-var ul = document.createElement("ul");
-window.addEventListener("hashchange", function () {
-  content.innerHTML = "";
-  var id = location.hash.substr(1); // substr은 문자열에서 배열은 0부터 시작하고 1을 적었기 때문에 0번째 문자는 짤리고 1~lastNum 까지의 문자열이 반환된다. 즉 #가 짤려나간다.
-
-  ajax.open("GET", CONTENT_URL.replace("@id", id), false); // replace를 이용해 마킹으로 해논 @id를 location으로 가져온 id로 교체해준다.
-
+function getData(url) {
+  ajax.open("GET", url, false);
   ajax.send();
-  var newsContent = JSON.parse(ajax.response);
-  var title = document.createElement("h1");
-  title.innerHTML = newsContent.title;
-  content.appendChild(title);
-});
-
-for (var i = 0; i < 10; i++) {
-  var li = document.createElement("li");
-  var a = document.createElement("a");
-  a.href = "#".concat(newsFeed[i].id);
-  a.innerHTML = "".concat(newsFeed[i].title, " (").concat(newsFeed[i].comments_count, ")");
-  li.appendChild(a);
-  ul.appendChild(li);
-} // 여기서 container로 바꿔준 이유는 document.querySelector("#root")가 반복되기 때문에
-// 기본적으로 코드는 반복되면 좋지 않다. 그 이유는 현재 #root를 나무라고 생각하고 그에 파생되는 코드들을 나뭇가지 라고 한다면
-// #root를 #app이라던가 다른 이름으로 변경해주게 되면 그에 파생된 나뭇가지들이 많으면 많을수록 모든 코드를 다 바꿔줘야 하기 때문에 좋지 않다.
-// 따라서 container를 만들어 줌으로써 이름을 변경해주게 되더라도 container의 #root만 바꿔줌으로써 어떠한 버그도 일어나지 않게 해준다.
-// 즉 #root는 나무 container는 연결해주는 커넥터 그에 파생되는 코드는 나뭇가지 라고 보면 될 것 같다.
+  return JSON.parse(ajax.response);
+} // 글 목록 화면을 보여주는 함수
 
 
-container.appendChild(ul);
-container.appendChild(content); // 자바스크립트 만으로는 현재 클릭이 되었는지 알 수가 없기 때문에 브라우저의 기능인 이벤트 기능을 사용한다.
+function newsFeed() {
+  var newsFeed = getData(NEWS_URL);
+  var newsList = [];
+  newsList.push("<ul>");
+
+  for (var i = (store.currentPage - 1) * 10; i < store.currentPage * 10; i++) {
+    newsList.push("\n    <li><a href=\"#/show/".concat(newsFeed[i].id, "\">").concat(newsFeed[i].title, " (").concat(newsFeed[i].comments_count, ")</a></li>\n    "));
+  }
+
+  newsList.push("</ul>");
+  newsList.push("\n    <div>\n      <a href=\"#/page/".concat(store.currentPage === 1 ? store.currentPage = 1 : store.currentPage - 1, "\">\uC774\uC804 \uD398\uC774\uC9C0</a>\n      <a href=\"#/page/").concat(store.currentPage === 3 ? store.currentPage = 3 : store.currentPage + 1, "\">\uB2E4\uC74C \uD398\uC774\uC9C0</a>\n    </div>\n  "));
+  container.innerHTML = newsList.join("");
+} // 글 디테일 화면을 보여주는 함수
+
+
+function newsDetail() {
+  var id = location.hash.substr(7); // substr은 문자열에서 배열은 0부터 시작하고 1을 적었기 때문에 0번째 문자는 짤리고 1~lastNum 까지의 문자열이 반환된다. 즉 #가 짤려나간다.
+
+  var newsContent = getData(CONTENT_URL.replace("@id", id));
+  container.innerHTML = "\n      <h1>".concat(newsContent.title, "</h1>\n      <div>\n        <a href=\"#/page/").concat(store.currentPage, "\">\uBAA9\uB85D\uC73C\uB85C</a>\n      </div>\n    ");
+} // 화면을 중계해주는 함수 (화면 전환을 컨트롤 하는 함수)
+
+
+function router() {
+  var routePath = location.hash; // location.hash에 #만 들어있을 때는 빈값이 리턴된다. #이후에 어떠한 값이 들어있어야 #blabla 이러한 값이 리턴된다.
+
+  if (routePath === "") {
+    newsFeed();
+  } else if (routePath.indexOf("#/page/") >= 0) {
+    store.currentPage = Number(routePath.substr(7));
+    newsFeed();
+  } else {
+    newsDetail();
+  }
+}
+
+window.addEventListener("hashchange", router);
+router(); // 자바스크립트 만으로는 현재 클릭이 되었는지 알 수가 없기 때문에 브라우저의 기능인 이벤트 기능을 사용한다.
 },{}],"../../../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
