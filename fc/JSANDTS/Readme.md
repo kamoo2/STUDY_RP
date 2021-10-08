@@ -50,7 +50,7 @@ Hacker News Client App : 많은 사람들이 직접 뉴스를 올리고 소통�
 - 이를 해결하기 위한 방법은 아이러니 하게도 DOM API 사용을 최소화 하는 것
 - 즉 문자열을 이용해보면 마크업 구조가 명확하게 그려지는 것을 볼 수 있다. -> innerHTML
 
-## 🔆 Commit 2 - 2021/10/04
+## 🔆 Commit 2 - 2021/10/04 16:30
 
 ### ❗️ KEY POINT
 
@@ -60,3 +60,61 @@ Hacker News Client App : 많은 사람들이 직접 뉴스를 올리고 소통�
 4. ⭐️⭐️⭐️⭐️⭐️ 기존의 hashchange 이벤트가 발생했을 때 디테일 화면을 보여줬지만 이제는 화면 전환을 해줘야 하기 때문에 hash가 변경 될 때마다 router 함수를 호출한다.
 5. Pagination을 만들기 위해서 url의 구조를 재구성 하고 여러가지 고려해야할 사항들을 생각하면서 코딩을 진행했다.
 6. currentPage는 공통적으로 사용되어야 하고 이러한 공유되어야 하는 자원들은 하나의 객체로 관리하는 것이 좋기 때문에 store라고하는 객체를 생성해준다.
+
+## 🔆 Commit 3 - 2021/10/09 03:27
+
+### ❗️ KEY POINT
+
+1. 기존의 마크업 구조를 template을 이용한 방법으로 변경 -> 기존의 코드보다 더 가독성이 뛰어난 코드
+2. tailwindcss,fontAwesome 사용해 UI 입히기
+3. 댓글을 만드는 함수 생성하기
+4. 댓글을 만드는 함수 생성 시 댓글,대댓글,대대댓글 ... 과 같은 구조를 생각하면 구현하기
+5. 이와 같은 구조는 끝을 알 수 없는 구조이므로 재귀 함수를 사용해 구현
+
+### 재귀 함수
+
+재귀 함수를 이용해서 상세 페이지의 댓글 부분 구현하기
+
+현재 하나의 뉴스에서 얻을 수 있는 데이터의 댓글 데이터의 구조는 다음과 같다.
+
+comments가 배열로 존재하고 만약 첫번째 댓글에 대댓글이 존재한다면 comments[0].comments[] 가 존재한다.
+
+이와 같은 구조는 끝을 알 수 없는 구조 이기 때문에 이럴 때 재귀 함수 테크닉이 자주 사용 된다고 한다.
+
+반복적으로 그려보면서 생각을 해보면 이해가 되는 구조 였다.
+
+맨 처음 호출되는 makeComment의 comments는 모든 댓글 중 첫번째 댓글을 배열로 가진다.
+
+이 처음 호출된 makeComment가 리턴되기 전에 다시 한번 호출 되기 때문에 이 makeComment 함수는 잠시 중단되고
+
+새로운 인자를 가진 makeComment가 호출이 된다. 이렇게 반복 되면서 makeComment가 리턴도 반복되고 마지막으로 처음 호출된 makeComment가 리턴될 때 까지 반복되는 것을 볼 수 있다.
+
+```js
+function makeComment(comments, called = 0) {
+  const commentString = [];
+
+  for (let i = 0; i < comments.length; i++) {
+    commentString.push(`
+        <div style="padding-left:${called * 40}px;" class="mt-4">
+          <div class="text-gray-400">
+            <i class="fa fa-sort-up mr-2"></i>
+            <strong>${comments[i].user}</strong> ${comments6[i].time_ago}
+          </div>
+          <p class="text-gray-700">${comments[i].content}</p>
+        </div>
+      `);
+
+    //재귀 호출
+    if (comments[i].comments.length > 0) {
+      commentString.push(makeComment(comments[i].comments, called + 1));
+    }
+  }
+
+  return commentString.join("");
+}
+
+container.innerHTML = template.replace(
+  "{{__comments__}}",
+  makeComment(newsContent.comments)
+);
+```
