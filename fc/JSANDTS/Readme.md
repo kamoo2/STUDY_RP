@@ -118,3 +118,12 @@ container.innerHTML = template.replace(
   makeComment(newsContent.comments)
 );
 ```
+
+## 🔆 Commit 4 - 2021/10/10 17:55
+
+### ❗️ KEY POINT
+
+1. 읽은 글 표시하기
+2. 읽은 글을 표시하기 위해서 store라는 객체에 feeds라는 빈 배열을 추가해주고 글 목록 페이지가 생성될 때 이 feeds를 가져와 데이터로 사용한다.
+3. 그리고 모든 뉴스 Item을 돌면서 read라는 boolean형 속성을 추가해준다.
+4. 이 read를 이용해 서로 다른 UI로 표현
