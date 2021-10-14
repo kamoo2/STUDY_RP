@@ -116,7 +116,7 @@ const store: Store = {
 let newsFeed: NewsFeed[] = store.feeds;
 ```
 
-## 🚫 Type Guard Function
+### 🚫 Type Guard Function
 
 여기서 container의 타입은 HTMLELEMENT | null 이므로 null 일 수도 있는 변수 이기 때문에 그냥 작성해주면
 
@@ -186,7 +186,74 @@ const newsDetail = getData<NewsDetail>(NEWSDETAIL_URL)
 
 작명을 할 때 생각을 하면서 어떤 이름이 좋은 이름인가를 생각하면서 코딩을 진행 하자.
 
----
+## 🔆 Interface와 Type Alias
+
+"타이핑 한다" 라는 말은 타입을 작성한다라는 말과 동일하다.
+
+이 타이핑을 하는 방법에는 두가지가 존재하는데 바로 **Interface** 와 **Type Alias** 이다.
+
+내가 생각 했을 때 Type Alias는 수학 연산으로 표현하고 Interface는 말로 표현하는 느낌이다.
+
+### Type Alias와 Interface의 차이점
+
+1. Type Alias에는 **Equlas(=)** 가 사용된다.
+2. Type Alias에는 Union Type과 Intersection Type이 존재한다.
+3. Interface에는 Union Type과 같은 | 연산을 할 수 있는 방법이 존재하지 않는다.
+4. Interface에는 Intersection Type과 같은 & 연산을 extends(상속)을 이용해 사용 가능하다.
+
+```ts
+// Type Alias 방법
+
+type News = {
+  id: number;
+  time_ago: string;
+  user: string;
+  title: string;
+  url: string;
+  content: string;
+};
+
+type NewsFeed = News & {
+  comments_count: number;
+  points: number;
+  read?: boolean;
+};
+
+// Interface 방법
+
+interface News {
+  id: number;
+  time_ago: string;
+  user: string;
+  title: string;
+  url: string;
+  content: string;
+}
+
+interface NewsFeed extends News {
+  comments_count: number;
+  points: number;
+  read?: boolean;
+}
+```
+
+## 🔆 readonly
+
+타입의 속성 중에서 수정되지 않는 속성이 존재하는데 혹시라도 수정되면 문제가 생길 수도 있다.
+
+예를 들면 NewsFeed의 속성에서는 read 속성 빼고는 전부 수정되지 않는 속성이다.
+
+이런 경우를 TS에서는 지시어 하나로 지원을 해주는데 바로 **readonly** 이다.
+
+readonly 지시어가 걸려있는 속성을 다른 곳에서 수정하게 된다면 에러가 발생하는 것을 볼 수 있다.
+
+이렇게 타입을 작성할 때 타입에 대한 설명을 풍부하게 하면 할 수록 코딩을 하면서 실수를 할 수 있는 부분을
+
+다 방지 할 수 있기 때문에 굉장히 단단하고 안전한 코드를 만들 수 있다.
+
+코드를 작성하면서 고민하는 것이 아니라 시간을 들여서 타입으로 다 설정 해놓고 작업을 진행하는 것이 작업 속도 향상에도 도움을 준다.
+
+이 부분이 TS의 가장 큰 장점이 된다.
 
 # Commit 목록
 
@@ -295,9 +362,19 @@ container.innerHTML = template.replace(
 
 ---
 
-### ❗️ 바닐라 JS로 작성한 Hacker News App을 TS로 전환해보기
+### ❗️ 바닐라 JS로 작성한 Hacker News App을 TS로 전환해보기 (Type Alias)
 
 1. 변수의 타입 작성하기
 2. 함수의 규격 작성하기
 
--
+## 🔆 Commit 6 - 2021/10/14 19:26
+
+---
+
+### ❗️ 바닐라 JS로 작성한 Hacker News App을 TS로 전환해보기 (Interface)
+
+1. Type Alias 방법으로 타이핑한 현재 코드를 Interface 방법을 이용한 타이핑으로 전환하기.
+
+- 일반적으로 개발자는 Type Alias와 Interface 방법을 혼용하지 않고 하나의 방법을 채택해서 일관성 있게 코드를 작성한다고 한다.
+- 어떤 방법이 더 좋은가가 아닌 각각 어떤 특징이 있고 어떤 장단점이있는지 공부해보고 나에게 맞는 방법을 선택해서 사용하면 된다.
+- 두 방법을 사용함에 있어서 차이점
