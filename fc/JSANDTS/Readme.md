@@ -424,3 +424,118 @@ Commit 9 에서는 함수로 작성된 2가지 UI Funtion과 보조 Funtion들�
 그러나 만약 Function에 있는 모든 코드를 생성자에 넣게 되면 매번 이 코드를 실행시키기 위해서는 매번 인스턴스를 만들어 줘야한다.
 
 이는 함수와 다를게 없기 때문에 생성자에 다 넣어서는 안된다.
+
+## 🔆 Commit 10 - 2021/11/17 02:52
+
+---
+
+코드를 분리해서 훨씬 더 깔끔하고 관리하기 쉬운 프로젝트 구조를 만들어 봅시다.
+
+1. core : 변화가 있더라도 공통적으로 사용될 코드들을 모아둘 디렉토리
+2. page : page들을 모아둘 디렉토리
+3. types : 타입들을 모아둘 디렉토리
+4. config.ts : url과 같은 데이터를 설정 데이터라고 하고 설정 데이터를 담을 파일
+5. store.ts : 전역 상태 관리
+
+### 👍 페이지 별로 분리해서 코드 작성하지만 import시에는 한 파일에서 작성한 것처럼 하는 기술
+
+page에 각각의 페이지들을 분리해서 작성하게 될텐데 그냥 사용하게 되면 app.ts에서 페이지 개수만큼의 import를 해줘야 한다.
+
+EX)
+
+```ts
+import Page1 from "./page";
+import Page2 from "./page";
+import Page3 from "./page";
+import Page4 from "./page";
+import Page5 from "./page";
+import Page6 from "./page";
+```
+
+이렇게 되면 100개가 되면 100줄의 코드를 작성해줘야 한다.
+
+그러면 분리해서 코드를 작성하지만 하나의 페이지에서 가져오는 것처럼 사용 할려면 어떻게 해야 할까 ?
+
+```ts
+import {Page1,Page2,Page3,Page4,Page5,Page6,...} from "./page"
+```
+
+위와 같이 사용하는게 코드가 훨씬 깔끔하고 가독성이 뛰어난 것을 볼 수 있다.
+
+이를 위해서는 먼저 page 디렉토리 안에 index.ts라는 파일을 생성해줘야 한다.
+
+index.ts에서 모든 페이지들을 import함과 동시에 export 해주게 되면 위와 같이 사용이 가능 하다.
+
+```ts
+export { default as Page1 } from "./page1";
+export { default as Page2 } from "./page2";
+export { default as Page3 } from "./page3";
+export { default as Page4 } from "./page4";
+export { default as Page5 } from "./page5";
+export { default as Page6 } from "./page6";
+```
+
+많이 사용되는 스킬이라고 하니깐 숙지해 두자
+
+### 👍 안전하게 전역상태 관리 하는 방법
+
+feeds와 currentPage를 속성으로 가지는 store 객체를 전역상태 관리 하기 위해서는 store 클래스를 만들어줘야 한다.
+
+여기서 feeds와 \_currentPage는 외부에서 직접적으로 읽는 것을 괜찮으나 변경되어서는 안된다.
+
+따라서 private 처리를 해줘서 외부에서 접근할 수 없도록 해줘야 안전하게 전역상태 관리가 가능하다.
+
+```ts
+class Store {
+  private feeds: NewsFeed[];
+  private _currentPage: number;
+}
+```
+
+그렇다면 외부에서 Store 객체를 사용해 feeds와 currentPage에 접근하기 위해서는 어떻게 해줘야 할까 ?
+
+필요한 기능들을 전부 메서드로 만들어주면 된다.
+
+단 getCurrentPage()를 만들어서 사용하기에는 불편하다. 겨우 속성값 하나를 읽어내는 건데
+
+그래서 내부에서는 함수로 작동하지만 외부에서는 속성처럼 보이게 하는 getter와 setter 문법을 사용해보자
+
+```ts
+class Store {
+  ...
+  get currentPage(){
+    return this._currentPage;
+  }
+
+  set currentPage(page:number){
+    this._currentPage = page;
+  }
+}
+```
+
+이렇게 2가지만 예를 들어서 작성했는데 필요한 모든 것들을 메서드로 구현해주면 된다.
+
+그리고 app.ts에서 store 객체를 생성해주고 이를 각각의 필요한 클래스에 생성자로 전달해준다.
+
+이때 생성자로 전달 받기 위해서는 store의 타입도 지정해주어야 한다.
+
+따라서 interface를 이용해 NewsStore를 생성해준다.
+
+이때 주의해야 할 점은 외부에서 보이는 것과 같이 타입을 지정해줘야 한다는 점이다. 아래의 코드를 보자
+
+```ts
+interface NewsStore {
+  getAllFeeds: () => NewsFeed[];
+  getFeed: (position: number) => NewsFeed;
+  currentPage: number;
+  hasFeeds: boolean;
+}
+```
+
+즉 currentPage와 hasFeeds는 store 클래스 내부에서는 메서드로 구현했지만 외부에서는 속성처럼 보이기 때문에
+
+위와 같이 타입을 정의해줘야 한다.
+
+이렇게 store 클래스로 구현한 메서드와 속성을 이용해서 페이지 클래스에서 코드를 수정해주게 되면
+
+app.ts에서 생성한 store 객체를 모든 페이지에서 접근이 가능해지고 코드 또한 훨씬 깔끔하게 정리되는 것을 볼 수 있다.
