@@ -36,20 +36,19 @@ export default class NewsDetailView extends View {
     this.store = store;
   }
 
-  render() {
+  render = async (): Promise<void> => {
     const id = location.hash.substr(7); // substr은 문자열에서 배열은 0부터 시작하고 1을 적었기 때문에 0번째 문자는 짤리고 1~lastNum 까지의 문자열이 반환된다. 즉 #가 짤려나간다.
     const api = new NewsDetailApi(CONTENT_URL.replace('@id', id));
-    const newsDetail: NewsDetail = api.getData();
+    const { title, content, comments } = await api.getData();
 
     this.store.makeRead(Number(id));
-    this.setTemplateData('currentPage', String(this.store.currentPage));
-    this.setTemplateData('title', newsDetail.title);
-    this.setTemplateData('content', newsDetail.content);
-    this.setTemplateData('comments', this.makeComment(newsDetail.comments));
-    this.updateView();
-  }
+    this.setTemplateData('currentPage', this.store.currentPage.toString());
+    this.setTemplateData('title', title);
+    this.setTemplateData('content', content);
+    this.setTemplateData('comments', this.makeComment(comments));
+  };
 
-  makeComment(comments: NewsComment[]): string {
+  private makeComment(comments: NewsComment[]): string {
     for (let i = 0; i < comments.length; i++) {
       const comment: NewsComment = comments[i];
       this.addHtml(`
