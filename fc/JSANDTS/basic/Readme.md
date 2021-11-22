@@ -84,7 +84,7 @@ function addAge(age) {
   return age + 1;
 }
 
-let age = addAge("30");
+let age = addAge('30');
 
 console.log(age);
 ```
@@ -162,7 +162,7 @@ var은 Hoisting으로 인해서 아무리 아래에 선언해도 제일 위로 �
 
 <br>
 
-var을 block 안에서 선언했음에도 block 밖에서 출력이 가능하다.
+var는 함수 레벨 스코프 이므로 함수 외에 있는 모든 것은 전역변수로 인식한다. 따라서 block 안에서 선언했음에도 block 밖에서 접근이 가능하다.
 
 ```js
 {
@@ -173,7 +173,7 @@ console.log(age); // 8 출력
 
 이렇게 var을 남발하게 된다면 나중에 선언하지 않은 값이 멋대로 출력된다던지 여러가지 문제점이 발생할 수 있다.
 
-### let과 const의 공통점과 차이점
+### let과 const의 차이점
 
 1. 공통점
 
@@ -182,9 +182,51 @@ console.log(age); // 8 출력
 
 2. 차이점
 
-- const는 선언과 동시에 초기화가 이루어 져야 하며 let은 선언 단계와 초기화 단계가 분리되어 진행될 수 있다.
+- const는 선언과 동시에 초기화와 할당이 이루어 져야 하며 let은 선언 단계와 초기화 단계가 분리되어 진행될 수 있다.
 - const는 재할당이 불가능 하며, let은 재할당이 가능하다. (변수와 상수의 차이)
 - const에서 객체를 할당하게 되었을 때는 객체 자체를 변경할 수는 없지만 속성값을 변경하는 것은 가능하다.
+
+### Hoisting과 변수생성 과정
+
+JS에서는 모든 선언을 해당 스코프의 선두로 옮긴 것 처럼 동작한다.
+예로 var,let,const,function,class를 Hoisting한다.
+
+여기서 var을 사용하지 않는 이유를 이해하기 위해서는 변수생성 단계와 TDZ를 알아야 한다.
+
+> 변수 생성 단계
+>
+> 1. 선언 단계 : Scope의 변수들을 등록하는 단계
+> 2. 초기화 단계 : 변수를 위한 공간을 메모리에 확보하고 undefined로 초기화 한다.
+> 3. 할당 단계 : undefined로 초기화 된 변수에 실제 값을 할당한다.
+
+var는 선언과 동시에 초기화가 되고 let은 선언과 초기화가 분리되어 진행된다.
+
+아래 코드를 보며 이해해 보자
+
+```js
+{
+  console.log(v); // 정상적으로 실행 -> undefined 출력
+  console.log(l); // Reference Error 발생
+
+  var v = 10;
+  let l = 20;
+
+  // 실제 실행 순서
+  var v; // 선언과 동시에 초기화 되어 undefined 값이 들어있음
+  let l; // 선언만 이루어짐
+
+  console.log(v); // undefined
+  console.log(l); // 초기화 전에 Access 할 수 없다는 레퍼런스 에러 발생
+
+  var v = 10; // 할당 단계
+  let l = 20; // 초기화가 이루어지고 다음 할당이 이루어짐
+}
+```
+
+> TDZ(Temporal Dead Zone:TDZ) : 일시적 사각지대
+>
+> - 위 코드에서 볼 수 있듯이 선언은 되어 있지만, 초기화가 되지 않아 이를 위한 자리가 메모리에 준비되어 있지 않은 상태를 의미한다.
+> - 따라서 let,const는 선언 전에 사용하게 되면 에러가 발생한다.
 
 <br>
 
@@ -206,14 +248,14 @@ console.log(age); // 8 출력
 
 ```js
 // 분해 구조 할당 사용 전
-const colors = ["red", "green", "blue"];
+const colors = ['red', 'green', 'blue'];
 const red = colors[0];
 const green = colors[1];
 const blue = colors[2];
 
 const Colors = {
-  black: "black",
-  yellow: "yellow",
+  black: 'black',
+  yellow: 'yellow',
 };
 const black = Colors.black;
 const yellow = Colors.yellow;
@@ -316,7 +358,7 @@ switch (age) {
     console.log(3);
     break;
   default:
-    console.log("??");
+    console.log('??');
     break;
 }
 ```
@@ -336,7 +378,7 @@ switch (age) {
 가장 기본적인 반복문 표현 방법이다.
 
 ```js
-const arr = ["a", "b", "c", "d"];
+const arr = ['a', 'b', 'c', 'd'];
 for (let i = 0; i < arr.length; i++) {
   console.log(arr[i]); // a,b,c,d
 }
@@ -397,7 +439,7 @@ for in은 객체의 key값에만 접근하고 싶을 때 자주 사용된다.
 
 ```js
 const obj = {
-  colors: "red",
+  colors: 'red',
   width: 200,
   height: 200,
 };
@@ -424,7 +466,7 @@ throw로 던져진 에러는 catch문을 찾아서 가게 된다.
 
 ```js
 function doException() {
-  throw new Error("Error");
+  throw new Error('Error');
 }
 
 function noException() {
@@ -432,7 +474,7 @@ function noException() {
 }
 
 function callException(type) {
-  if (type === "do") {
+  if (type === 'do') {
     doException();
   } else {
     noException();
@@ -441,12 +483,12 @@ function callException(type) {
 
 function main() {
   try {
-    callException("do");
+    callException('do');
   } catch (e) {
     console.log(e); // Error 출력
   } finally {
     // 예외가 일어나든 안일어나든 반드시 실행되어야 할 코드를 작성해주면 된다.
-    console.log("done");
+    console.log('done');
   }
 }
 ```
@@ -491,16 +533,16 @@ Type Alias를 사용하면 해당 타입을 가진 변수에 들어올 수 있�
 
 ```ts
 // 일주일의 요일을 담는 변수가 있다고 가정하자
-const monday: string = "월";
+const monday: string = '월';
 // friday에 안녕이라는 문자열이 들어오는 것은 실수이고 이를 제한해 안정성을 높여주자
-const friday: string = "안녕";
+const friday: string = '안녕';
 
 // Type Alias로 DayOfWeek라는 타입을 만들어 준다.
 
-type DayOfWeek = "월" | "화" | "수" | "목" | "금" | "토" | "일";
+type DayOfWeek = '월' | '화' | '수' | '목' | '금' | '토' | '일';
 
 // DayOfWeek 타입에는 "안녕" 이라는 문자열이 들어올 수 없다고 에러 표시가 뜬다.
-const friday: DayOfWeek = "안녕";
+const friday: DayOfWeek = '안녕';
 ```
 
 ### interface
@@ -531,19 +573,19 @@ type TUser = {
 };
 
 // type을 가져올 때 많은 타입들을 가져와야 한다면 아래와 같이 모든 타입을 가져오고 as를 이용한 별칭을 지어주는 방법이 효율적일 수 있다.
-import * as allTypes from "./types";
+import * as allTypes from './types';
 const iUser: allTypes.IUser = {
   id: 1,
-  name: "Moon",
-  email: "tjr@naver.com",
-  active: "Y",
+  name: 'Moon',
+  email: 'tjr@naver.com',
+  active: 'Y',
 };
 
 const tUser: allTypes.TUser = {
   id: 2,
-  name: "Kim",
-  email: "kim@naver.com",
-  active: "N",
+  name: 'Kim',
+  email: 'kim@naver.com',
+  active: 'N',
 };
 ```
 
@@ -635,12 +677,12 @@ type ArrowTGetApi = (url: string, search?: string) => Promise<string>;
 // 해당 함수 규격을 사용하기 위해서는 함수 정의문이 아니라 함수 정의 표현식을 사용해야한다.
 // 즉 = 을 사용해야 한다.
 
-const getApi: ArrowTGetApi = (url, search = "") => {
-  return new Promise((resolve) => resolve("OK"));
+const getApi: ArrowTGetApi = (url, search = '') => {
+  return new Promise(resolve => resolve('OK'));
 };
 
-const getApi: TGetApi = function (url, search = "") {
-  return new Promise((resolve) => resolve("OK"));
+const getApi: TGetApi = function (url, search = '') {
+  return new Promise(resolve => resolve('OK'));
 };
 ```
 
@@ -690,3 +732,590 @@ interface IRectConstructor {
 Type Alias를 사용하는 경우 : 데이터만을 묘사하는 경우
 
 Interface를 사용하는 경우 : 메서드를 포함한 데이터를 포괄하는 객체를 묘사하는 경우와 클래스
+
+<br>
+
+## 11. 함수
+
+---
+
+<br>
+
+JS 함수 만의 특징 : 언어 레벨에서 함수를 값으로 취급한다.
+
+이것의 의미는 함수를 변수에 넣을 수 잇다는 것을 뜻하고, 따라서 익명함수를 변수에 넣어 줘 사용이 가능하다.
+
+이때 변수에 함수를 넣어주게 되면 이는 식이 된다. -> 함수 표현식
+
+### 📣 함수정의문 VS 함수표현식
+
+<br>
+
+#### 함수 정의문 : 일반적인 프로그래밍 언어에서의 함수 선언과 비슷한 형식
+
+```js
+function 함수명() {
+  // 로직
+}
+```
+
+#### 함수 표현식 : JS 언어 만의 특징을 활용한 방식
+
+```js
+const 함수명 = function () {
+  // 로직
+};
+```
+
+#### 함수 표현식과 정의문의 차이점
+
+1. 세미콜론의 유무
+
+- 식은 항상 세미콜론으로 끝나고 문은 끝나지 않는다.
+- 함수 표현식도 일종의 변수에 값을 넣은 형태이기 때문에 식이 되고 세미콜론으로 끝난다.
+
+2. Hoisting
+
+- 함수 선언식은 코드를 구현한 위치에 관계없이 JS의 특징인 호이스팅에 따라 브라우저가 자바스크립트를 해석할 때 맨위로 끌어 올린다.
+- 함수 표현식은 const로 생성한 변수의 선언만 위로 끌어 올리고 값의 초기화와 할당은 해당 코드에 도착했을 때 진행 되므로 ReferenceError가 발생한다.
+
+```js
+// 실행전
+
+test(); // Hoisting으로 인해 정상적으로 실행
+test2(); // ReferenceError: 초기화 하기 전에 액세스 할 수 없다.
+
+// 함수 정의문
+function test() {
+  console.log('정의문');
+}
+
+// 함수 표현식
+const test2 = () => {
+  console.log('표현식');
+};
+
+// 실행후
+function test() {
+  console.log('정의문');
+}
+```
+
+### 📣 즉시실행 함수
+
+즉시실행 함수란 함수가 만들어 지는 동시에 즉시 한번 실행하는 함수를 뜻한다.
+
+이것은 어플리케이션에서 단 한번만 실행해야 하는 함수를 만들어야 할 때 익명함수를 활용해 즉시실행 함수로 구현해준다.
+
+```js
+(function () {
+  // 로직
+})();
+```
+
+### 📣 JS 함수 호출시 문제점
+
+JS에서는 매개변수(parameter)의 개수에 상관 없이 인자(argument)를 받아 호출이 자체는 문제없이 가능하다.
+
+예를 들어, 아래의 코드를 보자
+
+```js
+function sum(a, b, c) {
+  return a + b + c;
+}
+
+// 6 리턴
+const result = sum(1, 2, 3);
+
+// 에러가 떠야 한다고 생각하지만 호출 자체는 성공하고 NaN값을 리턴한다.
+const result2 = sum(1);
+
+// 호출도 성공하고 4개의 인자부터는 무시하고 6이 출력된다.
+const result3 = sum(1, 2, 3, 4, 5, 6);
+```
+
+그렇다면 sum이라는 함수가 인자로 전달되는 개수에 상관없이 계산할 수 있는 유연한 함수가 되기 위해서는 어떻게 해야할까 ?
+
+이렇게 인자가 가변적일 때도 처리를 할 수 있는 자바스크립트가 제공을 해준다.
+
+1. 유사배열 arguments
+
+```js
+// arguments에는 인자로 전달 된 모든 값들이 유사배열로 저장되어져 있다.
+function sum() {
+  let result = 0;
+  for (let i = 0; i < arguments.length; i++) {
+    result += arguments[i];
+  }
+  return result;
+}
+
+const addSum = sum(10, 20, 30); // 60
+const addSum2 = sum(10, 20, 30, 40); //100
+```
+
+2. arguments의 문제를 보완하는 rest parameter
+
+함수는 시그니처만 보고서 어떻게 작동하는지 알 수 있도록 작성해야 가독성이 좋다.
+
+그러나 arguments를 사용하게 되면 함수 시그니처만을 보고서는 이해할 수 없고 반드시 함수 전체를 봐야 이해할 수 있다.
+
+그래서 새로운 스펙이 등장했고 바로 **rest parameter**이다.
+
+rest parameter는 전개 파라미터라고 하며 굉장히 표현력이 높은 문법이다.
+
+```js
+// 여기서 ...은 몇개가 들어올지 모른다를 의미한다.
+function sum(...args) {
+  let result = 0;
+  for (let i = 0; i < args.length; i++) {
+    result += args[i];
+  }
+  return result;
+}
+```
+
+그냥 보기만 해서는 별로 변한게 없이 느껴지지만 함수 시그니처만 두고 보면
+
+arguments에서는 인자를 받지 않는 함수인지 아닌지 구분 할 수 없었지만
+
+전개 파라미터를 사용한 코드를 보면 바로 이 함수는 가변인자를 다루는 함수라는 것을 알수있다.
+
+### 📣 함수 호출의 방법 3가지
+
+```js
+// 1. 기본
+sum(10, 20, 30);
+// 2. call을 사용한 호출
+sum.call(null, 10, 20, 30);
+// 3. apply를 사용한 호출
+sum.apply(null, [10, 20, 30]);
+```
+
+> call과 apply의 차이
+>
+> - 기본적으로 같은 결과 값을 리턴하지만 사용 방법에서의 사소한 차이를 가지고 있다.
+> - 그러나 코드의 유연성에서 차이가 드러난다.
+
+```js
+// apply는 []로 인자를 받는다.
+// 따라서 함수 호출의 인자 값을 외부로 부터 전달 받아 무언가를 할 때 유연하게 처리 가능하다.
+
+const arr = [10, 20, 30];
+
+console.log(sum.apply(null, arr)); // 60
+```
+
+### 📣 Arrow Function
+
+Arrow Function을 사용하면 코드를 줄일 수 있고 가독성이 좋다고 생각한다.
+
+다음과 같이 사용한다.
+
+```js
+const arrowFunc = a => return a;
+```
+
+이와 같이 파라미터가 한개이면 ()를 생략할 수 있고 코드가 한 줄이고 바로 리턴하는 코드라면 {}를 생략 할 수 있다.
+
+### 📣 Generator Function
+
+이 함수는 function에 \*을 붙여 사용하는 함수이다.
+
+일반적으로 함수는 호출되면 실행되지만 생성기 함수는 최초에 호출되면 실행되지 않고 실행 준비 상태로 대기한다.
+
+그리고 Iterator 객체 하나를 반환하는데 이 객체를 사용해 함수를 실행했다 멈췄다가 할 수 있다.
+
+Iterator의 next() 메서드를 호출했을 때 Generator 함수가 실행되어, yield문을 만날 때 까지 진행하고, 해당 반환 값을 리턴한다.
+
+이후 next() 메서드가 호출되면 진행이 멈췄던 위치에서부터 재실행 한다.
+
+```js
+function* gen() {
+  yield 10;
+  yield 20;
+  yield 40;
+}
+
+const g = gen();
+
+console.log(g.next().value); // 10
+console.log(g.next().value); // 20
+console.log(g.next().value); // 40
+console.log(g.next().value); // undefined
+```
+
+<br>
+
+## 12. 일급 함수
+
+---
+
+<br>
+
+일급 함수 : 함수를 일반적인 값처럼 취급하는 것 (값처럼 변수에 넣는 것)
+
+일급 함수를 이용한 몇가지 테크닉이 존재한다.
+
+### 1 . 함수를 인자로 넘겨 줄 수 있기 때문에 가능한 테크닉
+
+함수도 하나의 값으로 취급하기 때문에 당연히 인자로도 전달할 수있다.
+
+아래의 코드를 살펴보자.
+
+```ts
+function ul(child: string): string {
+  return `<ul>${child}</ul>`;
+}
+
+function ol(child: string): string {
+  return `<ol>${child}</ol>`;
+}
+
+function makeLI(container: (child: string) => string, contents: string[]) {
+  const liList = [];
+
+  for (content of contents) {
+    liList.push(`<li>${content}</li>`);
+  }
+
+  return container(liList.join(''));
+}
+
+const htmlUL = makeLI(ul, ['월', '화', '수', '목', '금', '토', '일']);
+
+const htmlOL = makeLI(ol, ['봄', '여름', '가을', '겨울']);
+```
+
+makeLI의 첫번째 인자는 해당 LI태그를 감싸줄 부모 컨테이너를 만드는 함수를 전달해주고 두번째 인자는 LI로 생성할 컨텐츠를 전달해준다.
+
+따라서 makeLI 함수는 인자로 들어오는 함수에 따라 다른 값을 리턴하는 유연한 함수가 되었다.
+
+### 2 . 반환값으로 함수를 넘겨 줘 가독성을 높일 수 있는 테크닉
+
+```js
+// 기존의 함수
+function salePrice(discountRate: number, price: number) {
+  return price - price * (discountRate * 0.01);
+}
+
+console.log('여름 세일 - ' + salePrice(30, 100000));
+console.log('겨을 세일 - ' + salePrice(10, 100000));
+
+// salePrice를 쪼개 함수를 리턴해주는 함수로 변경해주면 사용시 가독성이 높아진다.
+
+function discountPrice(discountRate: number) {
+  return function (price: number) {
+    return price - price * (discountRate * 0.01);
+  };
+}
+
+const summerPrice = discountPrice(30); // 여름 가격을 리턴해주는 함수가 반환
+const winterPrice = discountPrice(10); // 겨울 가격을 리턴해주는 함수가 반환
+
+console.log(summerPrice(100000));
+console.log(winterPrice(100000));
+```
+
+코드를 보면 salePrice 함수는 2개의 파라미터를 가지고 있고 판매가를 리턴해준다.
+
+salePrice을 사용한 코드를 보면 이 가격이 여름 가격인지 겨울 가격인지 표현하지 못한다.
+
+그러나 함수를 반환해주는 discountPrice 함수를 이용해 summberPrice 변수에 함수를 넣어주게 되면 코드만 보고서 여름 가격이구나 판단 할 수 있다.
+
+<br>
+
+## 13. 비동기 함수
+
+---
+
+<br>
+
+```ts
+function delay(ms: number): Promise<string> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (Math.floor(Math.random() * 10) % 2 === 0) {
+        resolve('success');
+      } else {
+        reject('failure');
+      }
+    }, ms);
+  });
+}
+```
+
+기존의 방법 (call back 함수)
+
+```ts
+delay(3000) //
+  .then((result: string) => {
+    console.log('done Promise' + result);
+  })
+  .catch((error: string) => {
+    console.error('fail Promise' + error);
+  });
+```
+
+async await를 사용한 방법
+
+```ts
+async function main() {
+  try {
+    const result = await delay(3000);
+    console.log('done async' + result);
+  } catch (e) {
+    console.log('fail async!' + e);
+  }
+}
+```
+
+async await로 작성한 코드를 보면 delay라는 비동기 함수를 실행하고
+
+3초 뒤에 일어나야 할 코드가 바로 뒤에 작성되어져 있는 것을 볼 수 있다.
+
+비동기 함수를 순서대로 일어나는 코드 처럼 작성할 수 있다는 장점이 있다.
+
+<br>
+
+## 14. 객체
+
+---
+
+<br>
+
+객체는 여러가지 방법으로 만들 수 있다.
+
+### 객체 리터럴을 이용한 객체 생성
+
+```ts
+type Box = {
+  width: number;
+  height: number;
+  borderRadius: number;
+  backgroundColor: string;
+};
+
+// 직접 key와 value를 쳐서 하나의 객체를 만들었다.
+let box: Box = {
+  width: 200,
+  height: 200,
+  borderRadius: 5,
+  backgroundColor: 'red',
+};
+
+// 함수를 이용해 객체의 틀과 데이터를 분리
+function makeBox(
+  width: number,
+  height: number,
+  borderRadius: number,
+  backgroundColor: string
+): Box {
+  return {
+    width,
+    height,
+    borderRadius,
+    backgroundColor,
+  };
+}
+
+let funcBox = makeBox(100, 100, 0, 'blue');
+```
+
+두 방법 모두 객체 리터럴을 이용해 객체를 만들고 있지만 두 방법은 구성에 차이를 두고 있다.
+
+첫번째 방법은 객체의 틀과 데이터를 한번에 내부에서 처리하고,
+
+두번째 방법은 객체의 틀과 데이터를 분리해 데이터를 외부에서 받아와 처리한다.
+
+그냥 봤을 때는 첫번째 방법이 당연히 좋아보인다
+
+하지만 예를들어 Box 객체를 500개 만들어야 한다고 가정해보자
+
+그런데 객체의 속성명을 변경해야한다고 했을 때
+
+첫번째 방법은 모든 객체의 속성명을 바꿔줘야 하므로 500번 바꿔줘야 하지만,
+
+두번째 방법은 객체의 틀인 함수부분에 가서 속성명을 바꿔주기만 하면 되므로 1번만 바꿔주면 된다.
+
+그러므로 함수를 이용함 객체리터럴 방식이 더 변화에 용이한 구조를 가지고 있다.
+
+### 클래스를 이용한 객체 생성
+
+클래스로 생성한 객체는 인스턴스 객체라고 부른다.
+
+왜냐하면 클래스는 구성 정보를 가지고 있고 이를 실제로 현실화한 객체이기 때문이다.
+
+```ts
+class Shape implements Box {
+  width: number;
+  height: number;
+  borderRadius: number;
+  backgroundColor: string;
+
+  constructor(width: number, height: number, borderRadius: number, backgroundColor: string) {
+    this.width = width;
+    this.height = height;
+    this.borderRadius = borderRadius;
+    this.backgroundColor = backgroundColor;
+  }
+}
+
+const boxShape = new Shape(10, 10, 0, 'blue');
+```
+
+### 객체의 복사
+
+객체는 참조 타입이므로 상수에 객체를 전달해준다고 해서 서로 다른 객체를 바라보지 않는다.
+
+아래 코드에서 볼 수 있듯이 box.width 값을 변경해줬지만 box1.width 값도 변경된 것을 볼 수 있다.
+
+```ts
+const box1 = box;
+console.log(box.width); // 20
+
+box.width = 50;
+console.log(box.width); // 50
+console.log(box1.width); // 50
+```
+
+그렇다면 해당 객체를 참조하는 것이 아닌 새로운 객체를 만들기 위해서는 어떻게 해야할까 ?
+
+```ts
+// Object.assign(target객체,source객체1,2,3,...)의 사용
+// 여기서 source객체는 가변인자로 받기 때문에 개수에 상관없이 받을 수 있다.
+// 1번부터 순서대로 target객체에 복사된다.
+const box2 = Object.assign({}, box);
+
+// 전개 파라미터 사용
+// 이 방법을 사용하는 것이 가장 깔끔하고 복사하면서 속성까지 변경할 수 있기 때문에 많이 사용한다.
+const box3 = { ...box, width: 30 };
+
+// 가장 원시적인 방법인 객체를 문자열로 변경했다가 다시 객체로 변경하는 방법
+const box4 = JSON.parse(JSON.stringify(box));
+```
+
+이 3가지 방법을 이용하면 서로 다른 주소값을 가진 객체를 만들 수 있다.
+
+<br>
+
+## 15. 속성과 메소드
+
+---
+
+<br>
+
+객체에는 속성과 메소드가 존재한다.
+
+쉽게 설명하자면 속성은 데이터이고 메소드는 함수이다.
+
+여기서 객체에 메소드를 만드는 방법은 3가지가 존재한다.
+
+아래의 코드를 보고 자기가 편한 방법으로 사용하되 첫 번째 방법보다는 두번째 세번째 방법이 좋아보인다.
+
+```ts
+interface MyObject {
+  name: string;
+  age: number;
+  getFamilyName: () => string;
+  getLastName: () => string;
+  getBloodType: () => string;
+}
+
+const obj: MyObject = {
+  name: 'Seok Hwan',
+  age: 26,
+  // 기본적인 방법
+  getFamilyName: function () {
+    return 'Moon';
+  },
+  // function 키워드를 없앤 방법
+  getLastName() {
+    return 'Moon';
+  },
+  // Arrow Function 방법
+  getBloodType: () => 'A',
+};
+
+obj.age = -200;
+obj.age = 200;
+```
+
+그런데 상식적으로 나이가 -200살,200살 일 수 있을까 ?
+
+위 방법에서는 age는 속성이므로 데이터니깐 어떠한 Guard 로직을 짤 수가 없다.
+
+이는 Class의 Getter Setter를 이용해 해결 할 수 있다.
+
+bloodType도 C형이란 것은 존재하지 않기 때문에 이것을 해결하는 코드를 짜보자
+
+```ts
+class Person {
+  _bloodType: string;
+
+  constructor(bloodType: string) {
+    this._bloodType = bloodType;
+  }
+
+  // 외부에서는 속성처럼 접근 가능
+  set bloodType(btype: string) {
+    if (btype === 'A' || btype === 'B' || btype === 'O' || btype === 'AB') {
+      this._bloodType = btype;
+    }
+  }
+
+  get bloodType() {
+    return this._bloodType;
+  }
+}
+
+const p1 = new Person('A');
+
+p1.bloodType = 'C';
+console.log(p1.bloodType); // A
+```
+
+여기서 bloodType은 메소드 인데 사용하는 곳에서는 마치 데이터인 속성처럼 사용하고 있다.
+
+이것이 바로 Getter/Setter의 특징이다.
+
+클래스 내부에서는 마치 메소드처럼 코드를 작성할 수 있지만 외부에서 사용 할때는 속성처럼 사용이 가능하다.
+
+마지막 3번째 객체 생성 방법
+
+Object.create에 대해 알아보자
+
+Object.create는 자주 사용하지는 않는다. 특히 TS를 사용한다면 굳이 사용해야하나 싶기도 하다.
+
+TS에는 readonly와 optional mark가 존재하므로 값을 변경하지 못하게 또는 값이 있어도 되고 없어도 되도록 할 수 있다.
+
+```ts
+interface MyObject {
+  name?: string;
+  readonly age: string;
+}
+```
+
+JS에서 위와 같이 사용하기 위해서 Object.create를 사용한다.
+
+```js
+const obj = Object.create(null, {
+  name: {
+    value: 'Moon',
+    writable: false,
+    configurable: false,
+  },
+});
+
+obj.name = 'Seok';
+console.log(obj.name); // Moon
+
+delete obj.name;
+console.log(obj.name); // Moon
+```
+
+기본적으로 JS에서는 객체의 속성값을 변경할 수 있고 속성을 삭제하는 것도 가능하다.
+
+그러나 Object.create로 객체를 만들게 되면 default로 위와 같은 속성이 걸려있다.
+
+따라서 값을 변경할 수 없고 속성을 삭제 할 수도없다.
