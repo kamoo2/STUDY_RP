@@ -1,4 +1,4 @@
-# JS의 문법에 대해서 정리해보는 DIR 입니다.
+# JS의 문법에 대해서 정리해보는 DIR 입니다
 
 ## 1. 식별자
 
@@ -128,7 +128,7 @@ JS는 데이터를 변수에 넣을 때 그 변수의 타입을 매번 데이터
 
 <br>
 
-### 1. 같은 이름의 변수를 여러번 생성가능하다.
+### 1. 같은 이름의 변수를 여러번 생성가능하다
 
 <br>
 let,const와는 다르게 var은 같은 이름의 변수를 여러번 생성할 수 있다.
@@ -158,7 +158,7 @@ age = 4;
 
 var은 Hoisting으로 인해서 아무리 아래에 선언해도 제일 위로 올라가 버린다.
 
-### 3. block scope를 철저히 무시한다.
+### 3. block scope를 철저히 무시한다
 
 <br>
 
@@ -1319,3 +1319,767 @@ console.log(obj.name); // Moon
 그러나 Object.create로 객체를 만들게 되면 default로 위와 같은 속성이 걸려있다.
 
 따라서 값을 변경할 수 없고 속성을 삭제 할 수도없다.
+
+<br>
+
+## 16. 배열
+
+---
+
+<br>
+
+### 배열의 기본 메소드
+
+#### 1 . push & pop
+
+베열의 맨 마지막에 값을 넣거나 해당 값을 추출할 때 사용 된다.
+
+그리고 넣거나 뺀 값을 리턴한다.
+
+```js
+const numbers = [1, 2, 3];
+
+const a = numbers.push(4);
+console.log(numbers); // [1,2,3,4]
+
+const b = numbers.pop();
+console.log(numbers); // [1,2,3]
+
+console.log(a); // 4
+console.log(b); // 4
+```
+
+#### 2 . shift & unshift
+
+shift와 unshift는 pop&push와 같은 기능을 하지만 기준점이 맨 앞이다.
+
+shift는 pop과 연관이 있는데 pop은 맨 뒤의 요소를 빼내지만 shift는 맨앞의 요소를 빼낸다.
+
+unshift는 push와 연관이 있고 맨 앞에 인자로 받은 값을 추가한다.
+
+#### 3 . slice & splice
+
+`[].slice(strat,finish)`
+
+slice는 시작 index와 끝 index를 인자로 받아 해당 index를 잘라낸다.
+
+단, 기존의 배열은 변함이 없고 값만 잘라 배열을 만들어 리턴한다.
+
+```js
+const numbers = [1, 2, 3, 4];
+
+// numbers 배열에서 slice를 이용해 [2,3]인 배열을 만들고 싶다면
+const a = numbers.slice(1, 3);
+
+console.log(a); // [2,3]
+console.log(numbers); // [1,2,3,4]
+```
+
+`[].splice(start,deleteCount,추가할 값1,추가할 값2,...)`
+
+splice는 기존 배열 요소를 삭제 또는 교체하거나 새 요소를 추가해 배열의 내용을 변경한다.
+
+즉 이 메소드는 slice와는 다르게 원본 배열 자체를 수정한다.
+
+```js
+const numbers = [1, 2, 3, 4];
+
+const a = numbers.splice(1, 2, 5, 6); // 1번째 요소부터 2개 삭제하고 그자리에 5,6을 추가한다.
+
+console.log(a); // [2,3]
+console.log(numbers); // [1,5,6,4]
+```
+
+slice와splice의 차이점 정리
+
+1. slice는 기존 배열의 변화가 없고 splice는 기존 배열을 변화시킨다.
+2. 2번째 인자가 의미하는 바가 다르다. (slice는 끝 index / splice는 삭제할 개수)
+
+#### 4 . join & split
+
+join은 배열을 하나의 문자열로 바꿔주는 메소드 이다.
+
+인자로 구분자를 받으며 디폴트 값은 ,이다.
+
+```js
+const arr = ['안녕', '하세요', '여러분'];
+
+console.log(arr.join()); // '안녕,하세요,여러분'
+
+console.log(arr.join('')); // '안녕하세요여러분'
+console.log(arr.join(' ')); // '안녕 하세요 여러분'
+console.log(arr.join('-')); // '안녕-하세요-여러분'
+```
+
+split은 배열의 메소드가 아니라 문자열 메소드이다.
+
+join과는 정반대로 문자열을 배열로 바꿔준다.
+
+마찬가지로 구분자를 인자로 받으며 해당 문자열을 기준으로 요소를 나눠 배열을 만들어준다.
+
+```js
+const str = '안녕,하세요,여러분';
+
+console.log(str.split(',')); // ['안녕','하세요','여러분']
+```
+
+#### 5 . concat
+
+두 배열을 merge하는데 사용되는 메소드이다.
+
+```js
+const one = [1, 2];
+const two = [3, 4, 5];
+
+console.log(one.concat(two)); // [1,2,3,4,5]
+```
+
+concat을 이용해서 두 배열을 합칠 수 있지만 다른 방법도 가능하다.
+
+바로 전개 연산자를 이용하는 방법이다.
+
+```js
+const one = [1, 2];
+const two = [3, 4, 5];
+
+console.log([...one, ...two]);
+```
+
+### 배열 연산 메소드
+
+#### 1 . forEach & map
+
+배열을 순회하는데 가장 많이 사용되는 메소드는 forEach라는 메소드 이다.
+
+forEach를 사용하게 되면 배열의 각 요소를 순회하게 된다.
+
+첫번째 인자로는 원소의 데이터 그자체 이고 두번째 인자는 index 세번째로는 원본 배열 자체를 넘겨준다.
+
+단 로직 내부에서 필요한 정보만 인자로 기술해주면 된다.
+
+```ts
+books.forEach((book: string, idx: number, books: string[]) => {
+  console.log(book, idx);
+});
+```
+
+다음은 **map** 메소드이다.
+
+forEach와 모든 것이 동일하지만 차이점이 존재한다.
+
+forEach는 리턴을 하지 않지만 map은 전달된 함수가 리턴한 값을 모아서 배열로 만들어 리턴해준다.
+
+```ts
+const bookObjects: Book[] = books.map((book: string) => {
+  return {
+    title: book,
+    author: undefined,
+  };
+});
+
+console.log(bookObjects); // [Object,Object,Object] map에서 리턴한 객체를 배열로 만들어 리턴한다.
+```
+
+map 또한 체이닝 해서 사용이 가능한데 다음 코드를 보자.
+
+```ts
+const books: string[] = ['가', '나', '다', '라', '마'];
+
+const newBooks: Book[] = books
+  .map((title: string) => ({ title: book }))
+  .map((book: Book) => ({ ...book, author: '문석환' }));
+```
+
+string배열인 books를 순회하며 title을 가진 객체 배열로 만들어 줬고 객체 배열을 map으로 순회하며 작가를 추가해준 코드이다.
+
+위 코드도 좋은 코드이지만 더 가독성이 좋게 만들 수 있다.
+
+이는 일급 함수의 특징을 가지기 때문에 가능한 테크닉이다.
+
+```ts
+const intoTitle = (title: string) => ({ title: book });
+const makeAuthor = (name: string) => (book: Book) => ({ ...book, author: name });
+
+const newBooks = books.map(intoTitle).map(makeAuthor('문석환'));
+```
+
+map에서 사용되는 각각의 함수를 별칭을 붙여 만들어주고 makeAuthor에서는 name이라는 인자를 받고 함수를 리턴하는 구조를 가지고 있다.
+
+이렇게 사용했을때의 장점은 map에 전달되는 함수가 정확히 하는 행동에 대해서 별칭으로 유추 할 수 있고 작가의 이름을 변경하고자 할 때도
+
+훨씬 가독성이 뛰어나다.
+
+#### 2 . filter
+
+filter 메소드도 순회를 한다는 것은 동일하다.
+
+순회 하면서 함수가 true를 리턴하는 요소만 뽑은 새로운 배열을 반환해준다. (기존 배열에 영향X)
+
+```ts
+const gaArray: Book[] = newBooks.filter((book: Book) => book.title.includes('가'));
+
+console.log(gaArray); // (1) [Object] -> {title:'가',author:'문석환'}
+```
+
+#### 3. reduce
+
+reduce는 1개의 callback함수와 initialValue를 가지며 이 callback함수는 배열의 각 요소에 대해 실행한다.
+
+이 함수는 총 4개의 인자를 전달 받는다.
+
+1. accumulator(누산기)
+2. currentValue(처리할 현재 요소)
+3. currentIndex(처리할 현재 요소의 인덱스)
+4. array(reduce()를 호출한 배열)
+
+그리고 전달 받은 initialValue를 처음에 accumulator로 가진다.
+
+이렇게 보면 이해가 안되니 코드를 보며 이해해보자.
+
+```ts
+const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+const sum = numbers.reduce((acc, cur) => {
+  return acc + cur;
+}, 0);
+
+console.log(sum); // 55
+```
+
+위 코드는 reduce를 이용해 배열의 총합을 구하는 코드이다.
+
+첫번째로 acc에는 초기값인 0이 들어있고 cur에는 현재 요소인 첫 인덱스값 1이 들어간다.
+
+그리고 여기서 반환되는 0+1 -> 1이 acc의 값으로 들어가게 된다.
+
+따라서 acc는 1->3->6->10->...->55 로 마지막 리턴값인 55가 sum에 들어가게 된다.
+
+이 reduce는 위와 같이 숫자를 더하는데도 사용되지만 다양한 곳에서 사용될 수 있다.
+
+배열의 요소에 객체들이 들어가게 되고 이 객체들을 하나의 객체로 만들고 싶을 때도 사용할 수 있다.
+
+```ts
+type SomeObject = {
+  [key: number]: string | number;
+};
+
+const someObjects: SomeObject[] = [
+  { border: 'none' },
+  { fontSize: 14 },
+  { className: 'box sm-box' },
+];
+
+// 위 배열의 요소들을 순회하며 하나의 객체로 만들어 주자
+
+const someObject: SomeObject = someObjects.reduce(
+  (acc: SomeObject, cur: SomeObject) => ({ ...acc, ...cur }),
+  {}
+);
+
+console.log(someObject); // {border:'none',fontSize:14,className:'box sm-box}
+```
+
+<br>
+
+## 17. 튜플
+
+---
+
+<br>
+
+튜플은 타입스크립트에서만 제공하는 유형이다.
+
+튜플은 기본적으로 JS에서 제공하는 배열을 확장한 기능이라고 생각하면 된다.
+
+어떠한 배열을 만들고 싶은데 이 배열의 길이를 고정하고 싶다면 튜플을 사용한다.
+
+배열을 만들 때 길이를 고정하기 때문에 각 요소의 type을 개별적으로 설정해줄 수 있다는 장점이 있다.
+
+```ts
+const address: [number, string, string] = [123, '동구', '망양로'];
+
+// BookInfo 타입은 [string,string,number] 구조를 가진 튜플의 타입을 명시한다.
+type BookInfo = [string, string, number];
+
+const BookData: BookInfo[] = [
+  ['트렌드 코리아2022', '김난도', 2022],
+  ['헨리 8세', '세익스피어', 1884],
+];
+```
+
+여기서 BookData는 배열 안에 튜플을 가지고 있는 구조를 가지며 이런 복잡한 구조도 TS가 다 검사를 해준다.
+
+<br>
+
+## 18. 클래스
+
+---
+
+클래스는 동일한 종류의 객체를 여러개 생성해야 하는 경우에 사용 할 수 있다.
+
+여기서 class의 규격을 정의하고 싶다면 interface를 이용해 설계도를 정의해주고 implements 키워드를 이용해
+
+해당 규격을 가진 class라고 명시해주게 된다.
+
+따라서 해당 클래스는 interface에서 명시한 규격대로 만들어줘야 한다.
+
+```ts
+interface Container {
+  tagName: string;
+  className: string;
+  getTagName: () => string;
+}
+
+class MyContainer implements Container {
+  tagName: string;
+  className: string;
+
+  constructor(tagName: string, className: string) {
+    this.tagName = tagName;
+    this.className = className;
+  }
+
+  getTagName = () => this.tagName;
+}
+```
+
+그리고 하위 클래스에서 공통된 부분이 있다면 부모 클래스로 만들어줘 상속을 이용해준다.
+
+이때 하위 클래스에서 생성자에 super()를 해줘서 상위 클래스의 생성자도 실행될 수 있도록 해야한다.
+
+이는 사용 시 하위 클래스를 이용해 인스턴스 객체를 만들어 주기 때문이다.
+
+### 추상클래스
+
+클래스에는 추상 클래스와 추상 메소드라는 개념이 존재한다.
+
+추상 메소드를 사용하기 위해서는 해당 클래스가 반드시 추상 클래스이어야 하며 키워드는 **abstract** 라는 키워드를 사용한다.
+
+부모 클래스에서 추상 메소드를 선언 하고 자식 클래스에서 반드시 추상 메소드를 구현을 해줘야 한다.
+
+```ts
+abstract class Shape {
+  ...
+  abstract area: ()=> number;
+}
+
+class Circle extends Shape {
+  constructor(){
+    super();
+  }
+  ...
+
+  // area 메소드를 구현해 주지 않으면 에러 표시가 뜬다.
+  // 추상 메소드 이기 때문에 반드시 자식 클래스에서 구현을 해줘야 한다.
+  area = () => this._radius * this._radius * Math.PI;
+}
+```
+
+### 접근 제한자
+
+1. public
+2. protected
+3. private
+
+이 3개의 접근 제한자에 대해서 알아보자.
+
+public은 디폴트 접근 제한자로써 어디에서든 접근이 가능한 접근 제한자이다.
+
+protected는 내부와 자식 클래스에서 접근이 가능하지만 외부에서는 접근이 불가능한 접근 제한자이다.
+
+private는 내부에서만 사용 가능하며 자식 클래스와 외부에서는 접근 할 수 없는 접근 제한자이다.
+
+<br>
+
+## 19. 프로토타입
+
+---
+
+### 객체의 프로토타입 메커니즘
+
+프로토타입 체이닝 메커니즘을 이해하기 위해서 아래 코드를 살펴보자
+
+```js
+const c1 = {
+  name: 'C1',
+  color: 'red',
+};
+
+console.log(c1.toString()); // [object Object]
+```
+
+여기서 c1에는 toString이라는 메소드가 존재하지 않는데 어떻게 동작하고 [object Object]라는 값을 출력할 수 있을까 ?
+
+객체는 프로토타입 체이닝 메커니즘을 통해 메소드에 접근이 가능하다.
+
+c1.toString() 코드는 먼저 c1 객체에서 toString 메소드를 찾아보고 없으면 상위 객체(proto가 가르키는 객체)에 접근하여 해당 메소드를 찾을 수 있다. 있다면 동작 시키고 없다면 undefined가 된다.
+
+다음 코드도 한번 살펴보자
+
+```js
+const c1 = {
+  name: 'C1',
+  color: 'red',
+};
+
+const c2 = {
+  name: 'C2',
+  width: 300,
+};
+
+const c3 = {
+  name: 'C3',
+  height: 100,
+};
+
+//모든 객체는 __proto__를 가지고 있고 이를 이용해 상위 객체에 접근할 수 있다.
+
+// c1의 상위 객체에 c3를 넣고 c3의 상위 객체에 c2를 넣으면 c2 > c3 > c1 의 포함 관계를 가진다.
+// 따라서 c1.속성 했을 때 먼저 c1에 속성이 있는지 찾아보고 없다면 c3, c3에도 없다면 c2로 가서 찾고 c2에도 없다면 최상위 객체인 Object에 접근해서 찾아보게 된다. 여기 까지 찾아보고도 없다면 undefined가 된다.
+
+c1.__proto__ = c3;
+c3.__proto__ = c2;
+
+console.log(c1.height); // 100
+console.log(c1.width); // 300
+```
+
+c1에는 height와 width가 존재 하지 않지만 100과 300의 값이 출력되는 것을 볼 수 있다.
+
+### 함수의 프로토타입 메커니즘
+
+```js
+function Foo(name) {
+  this.name = name;
+}
+
+Foo.prototype.lastName = 'Wow';
+
+const f = new Foo('문석환');
+console.log(f); // Foo {name:'문석환'}
+console.log(f.lastName); // 'Wow'
+```
+
+함수를 이용해서 객체를 만들어 보았고 이 함수는 name을 인자로 받아서 name속성을 가지는 객체를 만들어준다.
+
+여기서 함수에는 prototype이라는 속성이 존재하는데 이 prototype을 이용해서 이전과 같은 기능을 해줄 수 있다.
+
+근데 함수의 속성인 prototype에 넣어줬다고 해서 어떻게 인스턴스 객체의 속성으로 사용할 수 있는 걸까요 ?
+
+이는 new 연산자에 의해 작동하게 된다.
+
+인스턴스 객체도 일반 객체이기 때문에 당연히 `__proto__`라는 속성이 존재한다.
+
+new 연산자를 이용해 인스턴스 객체를 만들어주게 되면 인스턴스 객체를 생성해주는 것 뿐만 아니라
+
+자동으로 `this.__proto__ = Foo.prototype`을 체이닝 해줘 인스턴스 객체에서도 접근이 가능하게 되는 것이다.
+
+이해가 안된다면 똑같이 생각 해보자
+
+```js
+// 실행 순서
+function Foo(name) {
+  this.name = name;
+}
+
+// 1. 객체 생성 후 해당 객체의 __proto__ 속성과 함수의 prototype 속성을 체이닝 해준다.
+const f = new Foo('문석환');
+
+function Foo(name) {
+  this.name = name;
+  this.__proto__ = Foo.prototype;
+}
+
+Foo.prototype.lastName = Foo.prototype;
+
+// f 인스턴스 객체에는 lastName이라는 속성이 없지만 해당 객체의 __proto__와 함수의 prototype을 체이닝 했기 때문에
+// 다음인 prototype속성에 접근해 lastName을 찾을 수 있고 존재하므로 'Wow'가 출력된다.
+console.log(f.lastName); // 'Wow'
+```
+
+현재는 ES6의 Class의 등장으로 잘 사용하지 않는 메커니즘 이지만 Class 자체도 이 메커니즘과 동작하는게 동일하기 때문에
+
+Class의 내부 메커니즘을 이해한다고 생각하고 잘 숙지해 두자
+
+<br>
+
+## 20. 인스턴스
+
+---
+
+<br>
+
+객체 인스턴스를 생성하는 방법에는 클래스를 이용한 방법과 함수를 이용한 방법이 존재한다.
+
+함수를 이용해서 객체 인스턴스를 만들 수 있지만 굳이 ES6에서 클래스를 만들어낸 이유에 대해서 알아보자.
+
+기본적으로 객체 인스턴스를 만들기 위해서는 new 연산자가 필수적으로 필요하다.
+
+### 첫 번째 이유
+
+첫번째 이유는 함수는 new 연산자를 강제할 수 없기 때문이다.
+
+이게 무슨 말이냐면 함수는 new를 붙인 것과 안 붙인 것 모두 동작이 가능하고 클래스는 new를 붙여야만 동작한다.
+
+아래 코드를 살펴보자.
+
+```js
+function CartV1() {
+  this.cart = [];
+  this.currentId = 0;
+}
+
+const shoppingCartV1 = new CartV1();
+const shoppingCartV1 = CartV1();
+```
+
+여기서 코드는 무리없이 동작하는 것을 볼 수 있다. 그러면 뭐가 다른 걸까 ?
+
+이것을 이해하기 위해서는 new 연산자의 암묵적인 수행 메커니즘에 대해서 이해해야 한다.
+
+1. new 연산자 실행
+2. {} 빈 인스턴스 객체 생성 -> 함수에서는 this라는 키워드로 접근 가능
+3. 함수에서 this를 이용해 필요한 속성을 넣어줌
+4. 자동적으로 new 연산자 함수는 모든 수행을 마치고 this 객체를 반환함
+5. shoppingCartV1에 this 객체가 들어오게됨
+
+이와 같은 메커니즘으로 인스턴스 객체가 만들어진다.
+
+그렇다면 new 연산자가 없이 실행하게 되면 어떻게 될까 ?
+
+당연히 함수에서의 this는 빈 인스턴스 객체를 가리키는 것이 아니라 전역객체인 window를 가리켜 잘 못된 동작을 하게 될 것이다.
+
+따라서 이것이 Class를 이용하는 첫 번째 이유이다.
+
+### 두 번째 이유
+
+두 번째 이유는 Class를 이용하면 하나로 관리를 할 수 있다는 점이다.
+
+이전의 프로토타입에서 공부 했듯이 new연산자를 이용해서 객체 인스턴스를 생성하게 되면 자동적으로
+
+`객체.__proto__ 와 함수.prototype을 체이닝 해준다.`
+
+그렇기 때문에 객체에서 함수의 속성인 prototype에 접근이 가능하고 사용이 가능하다.
+
+아래의 코드를 살펴보자.
+
+```js
+// 함수를 이용한 방법
+function CartV1() {
+  this.cart = [];
+  this.currentId = 0;
+}
+
+CartV1.prototype.getNewId = function () {
+  this.currentId++;
+  return this.currentId;
+};
+
+CartV1.prototype.addItem = function (item) {
+  this.cart.push({ ...item, id: this.getNewId() });
+};
+
+// 인스턴스 객체에서는 사용할 수 없고 함수에서만 접근 가능한 메소드
+CartV1.createItem = function (name, price) {
+  return {
+    name,
+    price,
+  };
+};
+
+const cartV1 = new CartV1();
+
+cartV1.addItem(CartV1.createItem('수박', 8000));
+cartV1.addItem(CartV1.createItem('사과', 12000));
+cartV1.addItem(CartV1.createItem('두부', 4000));
+```
+
+```js
+// class를 이용한 방법
+
+class CartV1 {
+  static createItem = (name, price) => ({
+    name,
+    price,
+  });
+  cart;
+  currentId;
+
+  constructor() {
+    this.currentId = 0;
+    this.cart = [];
+  }
+
+  getNewId = () => {
+    this.currentId++;
+    return this.currentId;
+  };
+
+  addItem = item => {
+    this.cart.push({ ...item, id: this.getNewId() });
+  };
+}
+
+const cartV1 = new CartV1();
+
+cartV1.addItem(CartV1.createItem('수박', 8000));
+cartV1.addItem(CartV1.createItem('사과', 12000));
+cartV1.addItem(CartV1.createItem('두부', 4000));
+```
+
+함수로 작성한 코드와 클래스로 작성한 코드 모두 사용하는 부분에서는 똑같이 사용되고 작동한다.
+
+그러나 확실히 Class로 작성한 코드는 모든 메소드와 속성들을 한 곳에서 작성할 수 있다보니 가독성이 뛰어난 것을 볼 수 있다.
+<br>
+
+## 21. 컨텍스트
+
+---
+
+<br>
+
+컨텍스트는 2가지가 존재한다.
+
+### Excution Context (실행 컨텍스트)
+
+함수가 호출 될 때 함수 컨텍스트가 생성 되며 호출시 메소드의 소유주에 따라 this가 결정된다.
+
+```js
+const person = {
+  name:'Moon',
+  age:26,
+  getAge(){
+    return this.age;
+  }
+
+
+console.log(person.getAge()); // 26
+
+const a = person.getAge;
+
+console.log(a()); // undefined
+}
+```
+
+왜 a에서는 this.age가 존재하지 않는 걸까 ?
+
+함수가 호출될 때 소유주에 따라 this가 결정된다고 했다.
+
+그러니 a()는 소유주를 알 수 없기 때문에 당연히 this.age는 존재하지 않는다.
+
+이를 해결하는 방법은 call과 apply의 사용이 있다.
+
+모든 함수에는 call과 apply를 사용할 수 있는데 이를 이용해 소유주를 모르고도 person객체 this에 접근할 수 있도록 해보자
+
+```js
+const a = person.getAge();
+
+a.call(person);
+console.log(a()); // 26
+```
+
+그러면 클래스로 객체를 생성할 경우에는 어떻게 될까 ?
+
+```ts
+class Person {
+  name: string;
+  age: number;
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+    this.getAge = this.getAge.bind(this);
+  }
+
+  getAge() {
+    return this.age;
+  }
+}
+
+const p1 = new Person('moon', 26);
+
+console.log(p1.getAge()); // 26
+
+const myAge = p1.getAge;
+console.log(myAge()); // undefined
+```
+
+이 경우도 당연히 call을 사용하면 해결해줄수 있다.
+
+그러나 이 방법 말고도 class 생성 시 컨텍스트를 고정시켜주는 방법도 있다.
+
+이것은 함수의 bind를 이용해 해결해준다.
+
+그래서 위 코드와 같이 bind를 이용해 생성자에서 getAge 메소드는 언제 어디서든 호출되더라도
+
+즉, 소유주가 확인이 되지 않더라도 언제나 현재 이 this로 고정시켜줬다.
+
+### Lexical Context (어휘 컨텍스트)
+
+위와 같은 방법으로 해결해 주는 것보다 더 편리한 Lexical Context를 이용하는 방법도 있다.
+
+이 어휘 컨텍스트는 어휘적으로 this를 고정시켜 주는 것이기 때문에 코드상으로 특별한 문법이 필요한데 바로 Arrow Function 이다.
+
+```ts
+class Person {
+  name: string;
+  age: number;
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+    this.getAge = this.getAge.bind(this);
+  }
+
+  getAge() {
+    return this.age;
+  }
+
+  getName = () => this.name;
+}
+
+const p1 = new Person('moon', 26);
+
+console.log(p1.getName()); // moon
+
+const x = p1.getName;
+
+console.log(x()); //moon
+```
+
+<br>
+
+## 22. 클로저
+
+---
+
+<br>
+
+아래 코드를 보면 어떻게 함수가 return되어 지역변수가 사라지는데 saveNumber에 접근이 가능한 걸까 ?
+
+```js
+function increment() {
+  let saveNumber = 1;
+  return function () {
+    return saveNumber++;
+  };
+}
+
+const inc = increment();
+
+console.log(inc()); // 1
+console.log(inc()); // 2
+console.log(inc()); // 3
+```
+
+일반적으로 함수에서 return이 되면 함수는 종료되며 지역변수 공간도 사라지게 된다.
+
+그런데 inc(); 의 출력값을 보면 1,2,3 정상적으로 작동하는 것을 볼 수 있다.
+
+이것이 가능한 이유가 바로 클로저라는 공간이 있기 때문이다.
+
+함수A가 있고 함수A가 함수B를 리턴하는 경우, 그리고 함수B에서 함수A의 지역변수를 사용하는 경우, 그 지역변수는 클로저라는 공간에 저장되게 된다.
+
+따라서 함수A가 종료되어 지역변수가 사라지게 되더라도 함수B에서는 saveNumber에 접근이 가능한 것이다.
+
+클로저를 사용하게 되면 변수를 외부에서 접근할 수 없도록 보호해줌과 동시에 그 값을 계속해서 사용할 수 있다.
+
+물론 TS에서는 클래스에서 값에 private 키워드를 적어주기만 해도 외부에서 접근 불가능하도록 구현이 가능하지만 JS에서는 이와 같은 기능이 없기 때문에 클로저가 필요하다.

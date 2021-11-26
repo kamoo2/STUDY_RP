@@ -118,78 +118,131 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   return newRequire;
 })({"app.ts":[function(require,module,exports) {
-"use strict"; // 객체 리터럴 (객체 생성 표기법)
+"use strict";
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var box = {
-  width: 200,
-  height: 200,
-  borderRadius: 5,
-  backgroundColor: 'red'
-}; // 함수를 이용한 방법 (객체 리터럴)
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function makeBox(width, height, borderRadius, backgroundColor) {
-  return {
-    width: width,
-    height: height,
-    borderRadius: borderRadius,
-    backgroundColor: backgroundColor
-  };
-} // 이 둘은 구조의 차이를 가진다.
-// 함수를 이용한 방법은 객체의 틀(규격)과 데이터를 분리한다.
-// 그렇다면 왜 객체의 규격과 사용하는 데이터를 분리하는게 중요할까 ?
-// 만약 500개의 Box를 만들어야 한다고 가정하자
-// 당연히 모든 박스의 속성값은 다양할 것이다.
-// 직접 모든것을 치는 방법으로 500개를 만들고, 함수를 이용해서 500개를 만들었다.
-// 여기서 만약에 객체의 borderRadius속성을 radius로 변경해야 한다고 하면 어떻게 될까 ?
-// 첫번째 방법으로 했을 때는 500개의 모든 borderRadius 속성을 다 변경해줘야 할것이고
-// 함수를 이용한 방법은 객체의 규격인 함수에 접근해 속성명을 변경해주기만 하면 될 것이다.
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+var Shape = /*#__PURE__*/function () {
+  function Shape() {
+    var borderWidth = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
-makeBox(100, 100, 0, 'blue'); // 클래스를 이용한 객체 생성
+    _classCallCheck(this, Shape);
 
-var Shape = function Shape(width, height, borderRadius, backgroundColor) {
-  _classCallCheck(this, Shape);
+    this.name = 'Shape';
+    this._borderWidth = borderWidth;
+  }
 
-  this.width = width;
-  this.height = height;
-  this.borderRadius = borderRadius;
-  this.backgroundColor = backgroundColor;
-}; // 클래스가 생성한 인스턴스 객체
-// 여기서 인스턴스 객체라고 하는 이유는 클래스는 구성 정보를 가지고 있고
-// 이를 실제로 현실화한 객체라는 의미로 인스턴스 객체라고 부른다.
+  _createClass(Shape, [{
+    key: "borderWidth",
+    get: function get() {
+      return this._borderWidth;
+    },
+    set: function set(width) {
+      if (width >= Shape.MIN_BORDER_WIDTH && width <= Shape.MAX_BORDER_WIDTH) {
+        this._borderWidth = width;
+      } else {
+        throw new Error('borderWidth 허용 범위를 벗어 났습니다.');
+      }
+    }
+  }]);
 
+  return Shape;
+}();
 
-var boxShape = new Shape(10, 10, 0, 'blue');
+Shape.MIN_BORDER_WIDTH = 0;
+Shape.MAX_BORDER_WIDTH = 30;
 
-if (boxShape instanceof Shape) {}
+var Circle = /*#__PURE__*/function (_Shape) {
+  _inherits(Circle, _Shape);
 
-box.borderWidth = 10;
-box['className'] = 'box rounded'; // 객체는 참조 타입이기 때문에 상수에 객체를 전달해준다고 해서 서로 다른 객체를 바라보지 않는다.
-// 이렇게 해준다고 해서 서로 다른 객체 2개가 되지 않는다.
-// 그냥 box1,box 모두 하나의 객체를 참조하고 있을 뿐이다.
+  var _super = _createSuper(Circle);
 
-var box1 = box; // 그러면 해당 객체를 참조하는 것이 아닌 새로운 객체를 만들기 위해서는 어떻게 해야할까 ?
-// 총 3가지 방법이 있다.
+  function Circle(radius) {
+    var _this;
 
-var box2 = Object.assign({}, box); // Object.assign은 첫번째 인자로 변경될 객체를 전달 받고 그 뒤로는 가변인자로 여러개의 객체를 받을 수 있다.
-// 그러면 순서대로 2번째 인자부터 첫번째 인자에 덮어씌워 진다.
-// 현재는 {} 빈 객체에 box라는 객체를 덮어 씌우는 방식이다.
-// 이 방법을 가장 많이 사용한다.
+    _classCallCheck(this, Circle);
 
-var box3 = Object.assign(Object.assign({}, box), {
-  width: 400
-}); // 가장 원시적인 방법이지만 확실한 방법
-// 객체를 문자열로 변경해줬다가 다시 객체로 변경하는 방법
+    _this = _super.call(this);
+    _this.name = 'Circle';
 
-var box4 = JSON.parse(JSON.stringify(box));
-box.width = 300;
-console.log(box1.width); // 300
+    _this.area = function () {
+      return _this._radius * _this._radius * Math.PI;
+    };
 
-console.log(box2.width); // 200
+    _this._radius = radius;
+    return _this;
+  }
 
-console.log(box3.width); // 400
+  _createClass(Circle, [{
+    key: "radius",
+    get: function get() {
+      return this._radius;
+    }
+  }]);
+
+  return Circle;
+}(Shape);
+
+var Rect = /*#__PURE__*/function (_Shape2) {
+  _inherits(Rect, _Shape2);
+
+  var _super2 = _createSuper(Rect);
+
+  function Rect(width, height) {
+    var _this2;
+
+    _classCallCheck(this, Rect);
+
+    _this2 = _super2.call(this);
+
+    _this2.area = function () {
+      return _this2._width * _this2._height;
+    };
+
+    _this2._width = width;
+    _this2._height = height;
+    return _this2;
+  }
+
+  _createClass(Rect, [{
+    key: "width",
+    get: function get() {
+      return this._width;
+    }
+  }, {
+    key: "height",
+    get: function get() {
+      return this._height;
+    }
+  }]);
+
+  return Rect;
+}(Shape);
+
+var circle = new Circle(50);
+var rect = new Rect(150, 200);
+console.log(circle.area());
+console.log(rect.area());
 },{}],"../../../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -218,7 +271,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50042" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49683" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
