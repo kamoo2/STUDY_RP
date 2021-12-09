@@ -2083,3 +2083,1212 @@ console.log(inc()); // 3
 클로저를 사용하게 되면 변수를 외부에서 접근할 수 없도록 보호해줌과 동시에 그 값을 계속해서 사용할 수 있다.
 
 물론 TS에서는 클래스에서 값에 private 키워드를 적어주기만 해도 외부에서 접근 불가능하도록 구현이 가능하지만 JS에서는 이와 같은 기능이 없기 때문에 클로저가 필요하다.
+
+<br>
+
+## 23. 제네릭
+
+---
+
+<br>
+
+타입을 호출하는 순간에 확정하기 위해서 사용되는 기법이다.
+
+```ts
+type User = {
+  id: number;
+  name: string;
+};
+
+type Address = {
+  zipcode: number;
+  address: string;
+};
+
+// Arrow Function에서의 제네릭 기법 사용 방법
+const pipeObjectOne = <T>(obj: T): T => {
+  return obj;
+};
+
+let po1 = pipeObjectOne<User>({ id: 1, name: '문' });
+let po2 = pipeObjectOne<User>({ id: 2, name: '김', address: '부산시' }); // address부분에 에러표시
+```
+
+pipeObjectOne이라는 함수는 호출시에 User 타입을 가지도록 타이핑이 되었기 때문에 인자로 User 타입의 객체만 전달해 줄 수 있고
+
+당연히 po1의 타입도 User 타입이 된다.
+
+이렇게 제네릭을 이용하면 필요에 따라 하나의 함수로 여러가지 타입을 생산할 수 있다.
+
+제네릭은 정말 어려운 기법이고 테크닉이라고 한다. 그리고 정말 테크닉의 종류가 많다고 한다.
+
+기본 제네릭을 충분히 학습하고 난 뒤에 사용해 볼 조금 더 고급형의 제네릭 예시 코드를 보자
+
+### Class에서의 제네릭
+
+```ts
+class State<S, Config = {}> {
+  private _state: S;
+  config: Config;
+
+  constructor(state: S, config: Config) {
+    this._state = state;
+    this.config = config;
+  }
+
+  getState(): S {
+    return this._state;
+  }
+}
+
+let s1 = new State<Address, { active: boolean }>(
+  {
+    zipcode: 50213,
+    address: '부산시',
+  },
+  { active: true }
+);
+
+const s1Data = s1.getState();
+
+console.log(s1Data.zipcode, s1Data.address, s1.config.active);
+```
+
+클래스를 사용 할때도 제네릭을 사용할 수 있으며 위 코드는 클래스를 new연산자를 통해 객체 인스턴스를 만들 때
+
+생성자로 전달해 줄 값에 대한 타입을 생성과 동시에 지정해 줄 수 있다.
+
+그리고 당연히 getState 함수로 리턴되는 값 또한 Address 타입이 되므로 s1Data. 에는 Address 속성이 자동적으로 mapping 된다.
+
+이렇게 제네릭을 사용함으로써 얻을 수 있는 장점은 유연하게 타입을 변경할 수 있다는 점이다.
+
+State라는 클래스가 존재하고 이 클래스의 getState 함수로 리턴될 수 있는 타입이 여러가지 라고 가정하면
+
+제네릭을 사용하지 않게 되면 클래스 내부에서 하나하나 수정해줘야 하지만 제네릭을 사용하면 new연산자 코드에서만 타입을 변경해 주면 된다.
+
+### 고급 제네릭 기법 (객체의 Key)
+
+입력 값으로 객체를 주고 그 객체에서 그 객체가 가지고 있는 키 중에 하나를 반환하는 함수를 만든다고 가정해 보자
+
+```ts
+// keyof를 통해서 객체의 key들을 뽑아내고 이를 확장시킴
+// 따라서 x라는 객체를 전달 받으면 key는 a,b,c,d만을 전달 받을 수 있다.
+function getProperty<Type, Key extends keyof Type>(obj: Type, key: Key) {
+  return obj[key];
+}
+
+let x = { a: 1, b: 2, c: 3, d: 4 };
+
+console.log(getProperty(x, 'a')); // 1 출력
+console.log(getProperty(x, 'm')); // m이 x 객체에 없다고 에러
+```
+
+### 고급 제네릭 기법 (인터페이스)
+
+```ts
+interface KeyPair<T, U> {
+  key: T;
+  value: U;
+}
+
+let kv1: KeyPair<number, string> = { key: 1, value: 'Kim' };
+let kv2: KeyPair<number, number> = { key: 1, value: 12345 };
+```
+
+<br>
+
+## 24. @types
+
+---
+
+<br>
+
+@types는 라이브러리를 설치할 때 많이 봐왔을 것이다.
+
+예를 들어서 게시물 객체를 생성한다고 했을 때 해당 id는 Unique 해야 할 것이다.
+
+그래서 라이브러리를 찾다가 uuid라는 라이브러리를 찾고 `npm i uuid`로 설치를 하고 `import {v4} from 'uuid'`를 하게되면
+
+에러표시가 뜨는 것을 볼 수 있다.
+
+이것은 해당 라이브러리가 TS를 지원하지 않기 때문이다.
+
+따라서 이런 경우에는 npm 페이지에서 @types 키워드를 붙여 검색해보면 보통 TS용 라이브러리가 존재 할 것이다.
+
+`npm i @types/uuid` 를 통해서 라이브러리를 설치 해주면 에러 표시가 사라진 것을 볼 수 있다.
+
+<br>
+
+## 24. JSON
+
+---
+
+<br>
+
+JSON은 데이터를 주고 받고 하기 위한 포멧이고 JSON과 JS의 객체는 비슷한 형태를 가진다.
+
+그러나 JSON은 JS의 객체에 비해 엄격한 규칙을 가지는데 다음과 같다.
+
+1 . key와 문자열 value는 반드시 ""로 감싸줘야 한다.
+2 . 마지막에는 ,를 지워줘야 한다.
+3 . 지원하는 value 타입이 제한적이다. (string,number,array,boolean,object)
+
+### JSON의 형태
+
+```js
+const jsonString = `
+  {
+    "name":"Moon Seok Hwan",
+    "age":26,
+    "bloodType":"A"
+  }
+`;
+```
+
+### JSON의 데이터를 JS 객체로 변경해주는 방법
+
+```js
+const myJson = JSON.parse(jsonString);
+```
+
+### JS 객체를 JSON 데이터로 변경해주는 방법
+
+```js
+console.log(JSON.stringfy(myJson));
+```
+
+JSON은 다음과 같이 규칙이 존재하기 때문에 오류가 발생하기 쉽다.
+
+따라서 오류가 발생했을 때 에러 처리를 해줘야 안전한 웹/앱이 될 수 있다.
+
+이는 예외 처리 구문 try-catch를 사용해줘 처리해주면 된다.
+
+<br>
+
+## 25. 라이프 사이클과 스코프
+
+---
+
+<br>
+
+스코프는 전역 스코프,함수 스코프,블록 스코프가 있다.
+
+함수 스코프는 함수가 생성되었을 때 생기며 블록 스코프는 코드를 묶는 블록 {}이 있으면 생긴다.
+
+그러나 함수 스코프와 블록 스코프가 계속해서 존재하지는 않는다.
+
+예를 들어 함수 스코프는 함수가 리턴이 되는 순간 스코프가 사라진다.
+
+그리고 블록 스코프는 코드를 묶는 블록에서 벗어나면 스코프가 사라진다.
+
+그러므로 스코프 공간에서 생성되는 함수나 변수는 스코프와 삶을 함께한다.
+
+즉 스코프가 사라지면 해당 함수나 변수도 사라지게 된다.
+
+JS가 이러한 메커니즘을 가진 이유는 컴퓨터의 자원이 유한한 자원이기 때문이다.
+
+변수와 함수를 생성하고 사용된 후 더 이상 사용되지 않지만 계속해서 공간을 차지하고 있으면 효율적이지 않다.
+
+따라서 스코프의 생성과 제거에 따라서 변수와 함수도 생성되고 제거 될 수있도록 디자인 되어져 있다.
+
+### 스코프의 특징
+
+스코프는 중첩이 가능하다.
+
+전역 스코프가 존재 하고 그 안에 함수 스코프와 블록 스코프가 만들어진다.
+
+스코프가 중첩 되어졌을 때 안쪽 스코프에서는 바깥쪽 스코프의 자원을 사용 할 수 있지만 바깥쪽에서 안쪽 스코프를 사용할 수는 없다.
+
+```js
+let x = 10;
+
+function test() {
+  let y = 20;
+  console.log(y); // 20
+  console.log(x); // 10
+  return y;
+}
+
+console.log(y); // y is not defined
+
+console.log(test()); // 20
+```
+
+현재 위 코드는 전역 스코프 안에 test 함수 스코프가 있는 구조 이다.
+
+따라서 test 함수 스코프 내에서는 전역 스코프의 x를 사용 할 수 있지만
+
+전역 스코프에서는 함수 스코프 내의 y를 사용 할 수 없다.
+
+### 호이스팅
+
+스코프가 생성이되면 해당 스코프 내부에 있는 모든 자원을 미리 만들게 된다.
+
+이것이 바로 호이스팅 이다.
+
+```js
+foo(); // 무리 없이 호출 됨 -> 호이스팅으로 미리 만들었기 때문에
+zoo(); // 함수표현식에서는 사용 불가
+function foo() {
+  console.log('foo');
+}
+
+const zoo = function () {
+  console.log('zoo');
+};
+```
+
+따라서 가독성이 좋은 코드를 만들기 위해서는 호이스팅이 되더라도 반드시 후에 호출하는 습관을 들이는게 좋다.
+
+<br>
+
+## 26. 동기와 비동기
+
+---
+
+<br>
+
+동기 코드란 우리가 계속해서 사용해 왔던 코드들이 대부분 동기 코드이다.
+
+```js
+function double(x) {
+  return x * 2;
+}
+
+const x = double(2);
+const y = x;
+```
+
+위 코드를 보면 x의 값이 함수를 통해 확정이 되어야 그다음 코드가 진행될 수 있는 것을 볼 수 있다.
+
+이렇게 순서대로 코드가 진행되는 것을 동기 코드라고 한다.
+
+그러면 비동기 코드는 무엇일까 ?
+
+비동기 코드는 앞의 코드가 실행되든 안되든 상관하지 않고 뒤의 코드가 실행 될 수 있는 코드 이다.
+
+비동기 코드를 이해해보기 위해 setTimeout 함수를 사용해보자
+
+```js
+function calcValue(x, y) {
+  setTimeout(() => {
+    return x + y;
+  }, 100);
+}
+
+const x = calcValue(10, 20);
+const y = x;
+```
+
+동기 코드라면 x의 값이 계산되어 30이라는 값이 들어오고 이 30을 y에 전달해 줄 것이다.
+
+그러나 구현한 setTimeout은 0.1초 뒤에 실행되는 코드이다.
+
+그래서 return x+y는 코드들이 순식간에 지나간 후 0.1초 뒤에 실행되기 때문에
+
+순식간에 실행되는 x에는 undefined가 들어오게 된다.
+
+x라는 메모리 공간을 만들었지만 calcValue()를 통해 값을 받지 못했기 때문이다.
+
+따라서 y에는 undefined라는 값이 들어온다.
+
+이렇게 코드의 실행흐름이 맞지 않는 이러한 코드가 바로 비동기 코드이다.
+
+따라서 이러한 비동기 코드의 문제점을 해결하기 위해 함수에 callback 함수를 인자로 전달해줘 callback 함수에서 최초 함수의 자원을 전달 받아 사용할 수 있다.
+
+근데 만약 이러한 비동기 코드가 여러개여서 콜백 함수를 여러번 사용한다고 가정해보자.
+
+정말 가독성이 떨어지는 코드를 볼 수 있을 것이다.
+
+그래서 ES6에서 콜백 지옥에서 탈출 하기 위해서 Promise라는 함수를 만들었다.
+
+Promise는 인스턴스 객체를 만들어 내는 함수로써 인자로 resolve와 reject를 받는다.
+
+resolve는 해당 비동기 코드가 성공적(fulfill)일 때 사용되고 실패 할 때는 reject가 사용된다.
+
+이때 resolve와 reject의 인자로 값을 전달 해 줄수 있고 이를 다음 콜백 함수에서 전달 받을 수 있다.
+
+그리고 인스턴스 객체는 then,catch,finally 라는 메소드를 가진다.
+
+then은 resolve 됬을 때 실행되는 메소드이고 catch는 reject 됬을 때 실행,
+
+마지막으로 finally는 성공,실패 관계없이 실행되는 메소드 이다.
+
+```js
+const p = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve('success');
+  }, 1000);
+});
+
+p.then(ok => {
+  console.log(ok); // 1초 뒤 success 출력
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject('fail');
+    }, 1000);
+  });
+})
+  .then(ok => {
+    console.log(ok);
+  })
+  .catch(error => {
+    console.log(error); // 총 2초 후 fail 출력
+  })
+  .finally(() => {
+    console.log('finish'); // 총 2초 후 finish 출력
+  });
+```
+
+<br>
+
+## 27. DOM
+
+---
+
+<br>
+
+DOM은 문서 객체 모델(Document Object Model)을 뜻한다.
+
+DOM API를 이용해서 html문서를 직접적으로 조작할 수 있다.
+
+간단한 웹어플리케이션에서는 괜찮겠지만 조금 규모가 큰 프로젝트에서 DOM API를 사용하게 되면 가독성이 매우 떨어지게 된다.
+
+그리고 DOM API는 너무 방대하다. 따라서 실무에서는 DOM 사용하는 것을 추천하지 않는다고 한다.
+
+그러나 DOM의 개념과 구조에 대해서는 알고 있어야 프론트엔드 개발자로서 성장하는데 어려움이 없다고 한다.
+
+<br>
+
+## 28. 이벤트 시스템
+
+---
+
+<br>
+
+이벤트는 중첩되었을 때 캡처링과 버블링의 방식으로 전파 될 수 있다.
+
+코드를 보면서 알아가 보자
+
+```js
+// index.html
+
+<div class="box1" data-name="red">
+  <div class="box1" data-name="blue">
+    <div class="box1" data-name="yellow"></div>
+  </div>
+</div>;
+
+// js
+
+function main() {
+  const BUBBLING_PHASE = false;
+  const CAPTURING_PHASE = true;
+  const PHASE_NAME = ['NONE', 'CAPTURING', 'TARGET', 'BUBBLING'];
+
+  function eventLogger({ target, currentTarget, eventPhase }) {
+    console.log(eventPhase);
+    console.log(`${target.dataset.name} ${currentTarget.dataset.name} ${PHASE_NAME[eventPhase]}`);
+  }
+
+  let divs = document.querySelectorAll('div');
+  divs.forEach(div => div.addEventListener('click', eventLogger, BUBBLING_PHASE));
+}
+
+document.addEventListener('DOMContentLoaded', main);
+```
+
+### DOMContentLoaded
+
+초기 html 문서를 다 로드하고 난 후에 발생하는 이벤트이다.
+
+따라서 다 로드된 후에 main 함수를 호출한다.
+
+### CAPTURING 과 BUBBLING
+
+캡쳐링과 버블링은 이벤트가 발생하는 흐름을 설정하는 방법이다.
+
+CAPTURING과 BUBBLING은 addEventListener 메소드의 3번째 인자에 전달해 줄 수 있다.
+
+default 값은 false로 BUBBLING 흐름에 따라 이벤트가 처리된다.
+
+BUBBLING인 경우에는 마치 탄산수의 탄산이 아래부터 위로 올라가는 것 처럼 Target 객체부터 부모,조부모... 로 올라 가면서 이벤트가 처리되는 흐름이다.
+
+가장 안쪽 박스인 yellow 박스를 처리하면 다음과 같이 출력된다.
+
+```js
+yellow yellow TARGET
+yellow blue BUBBLING
+yellow red BUBBLING
+```
+
+target인 yellow부터 마지막 조상인 red까지 역순으로 이벤트가 처리되는 것을 볼 수있다.
+
+CAPTURING은 그와 반대로 최상위 부모부터 Target으로 가는 순서로 이벤트가 처리된다.
+
+```js
+yellow red CAPTURING
+yellow blue CAPTURING
+yellow yellow TARGET
+```
+
+그리고 click 이벤트로 호출되는 함수는 e라는 이벤트 객체를 전달 받는다.
+
+이벤트 객체에는 해당 이벤트에 관한 무수히 많은 정보들이 담겨 있다.
+
+우리가 사용한 정보는 target,currentTarget,eventPhase이다.
+
+target은 현재 내가 클릭한 객체를 뜻하고 currentTarget은 이벤트 흐름에 따라 발생하는 현재 객체를 뜻한다.
+
+마지막으로 eventPhase는 0~3까지의 숫자를 가지며 그 중 하나의 값을 가진다.
+
+- 0 : NONE -> 아무 발생 하지 않음
+- 1 : Capturing Phase
+- 2 : Target -> 이벤트가 event.target에 도착
+- 3 : Bubbling Phase
+
+### 이벤트 루프란 ?
+
+이벤트 루프에 대해서 이해하기 위해서는 전체적인 흐름을 파악해야한다.
+
+이벤트 루프는 딱 한가지의 일을 한다.
+
+바로 Call Stack과 Event Queue를 주시하면서 Call Stack이 비었을 때 Event Queue에 있는 cb함수가 있다면 해당 함수를 call stack으로 전달해준다.
+
+기본적으로 함수는 호출 시 call stack에 쌓이고 끝나면 빠져나간다.
+
+```js
+function foo() {
+  console.log('foo');
+}
+
+function zoo() {
+  foo();
+}
+
+zoo();
+```
+
+이렇게 코드가 구현됬다고 하면 call stack에는 zoo() > foo() > console.log('foo')순서대로 call stack에 쌓이고 console.log 부터 역순으로 빠져나간다.
+
+이것은 stack의 LIFO(Last In First Out) 특성을 가지기 때문이다.
+
+이런 동기적 코드들은 call stack에서만 처리가 이루어진다.
+
+비동기적 코드가 발생했을 때 call stack에 쌓이고 비동기 함수는 web apis엔진에서 처리가 된다.
+
+그리고 처리가 끝나면 해당 cb함수는 event queue에 들어가게 된다.
+
+코드의 모든 비동기 코드에 대한 cb함수가 순서대로 들어가고 FIFO의 특성을 살려 먼저 들어온 순서대로 나간다.
+
+event loop는 항상 call stack 과 event queue를 주시하고 있으며 call stack이 비워졌을 때
+
+event queue에 cb함수가 존재한다면 순서대로 call stack으로 올려준다.
+
+event queue에 cb함수가 여러개 들어와 있다면 맨 처음 함수를 먼저 보내고 해당 함수가 끝나서 또 call stack이 비워지면 다음 cb함수가 올라간다.
+
+<br>
+
+## 29. 타입스크립트의 명확한 한계
+
+---
+
+<br>
+
+타입스크립트는 우리에게 컴파일 환경 즉 에디터 환경에서 모든 타입체킹을 통해서 컴파일 에러를 보여주는 역할을 한다.
+
+그러나 결국 타입스크립트도 자바스크립트에서 파상된 언어이므로 결국에는 자바스크립트로 변환해 줘야 브라우저는 인식한다.
+
+```ts
+// ts
+const objType = {
+  x: number,
+  y: number,
+};
+
+function add(x: number, y: number): number {
+  return x + y;
+}
+
+const json = `{"x":10,"y":20}`;
+const obj: objType = JSON.parse(json) as objType;
+
+add(obj.x, obj.y);
+
+// js로 변환된 코드
+
+('use strict');
+
+function add(x, y) {
+  return x + y;
+}
+const json = `{"x":10,"y":20}`;
+const obj = JSON.parse(json);
+obj(obj.x, obj.y);
+```
+
+이렇게 ts로 타이핑한 부분에 대해서는 모두 사라지는 것을 볼 수 있다.
+
+그런데 여기서 외부로 들어오는 데이터가 "x":"abc" 이렇게 들어오게 된다면 이는 런타임 환경에서 발생한 에러이기 때문에 타입스크립트가 도와줄 수 있는게 아무것도 없다.
+
+add 함수를 통해서 30이라는 값이 나와야 하는데 abc20이라는 문자열이 생기게 되고 이를 이용하는 또 다른 함수에서도 당연히 문제가 생기게 될 것이다.
+
+그래서 어떤 데이터를 받고 그 데이터를 함수로 넘겨줄 때 어떤 식으로 방어 코드를 쓸 수 있을까에 대해서 항상 고민하고 연구해서 경험을 쌓는 것이 중요하다.
+
+<br>
+
+## 30. Web API
+
+---
+
+<br>
+
+많이 사용되는 API에 대해서 알아보자
+
+### 1 . localStorage & sessionStorage
+
+이 두 Storage가 가장 많이 사용된다.
+
+둘다 가지고 있는 메소드가 동일하므로 사용법이 동일하다.
+
+- localStorage.setItem()
+- localStorage.getItem()
+- localStorage.removeItem()
+- localStorage.clear()
+
+차이점
+
+- localStorage는 자바스크립트 코드로 clear하거나 remove하기 전에 삭제되지 않는다.
+
+- 그에 반면 sessionStorage는 브라우저가 종료되는 순간 모두 삭제 된다.
+
+#### Storage를 사용할 때 주의할 점 ❗️
+
+저장할 때 반드시 문자열로 저장을 해야한다.
+
+즉 객체로 저장되지 않기 때문에 반드시 json 문자열로 변경해준 후에 저장을 해주고
+
+해당 데이터를 가져와 사용 할 때는 다시 객체로 변경해준 후에 사용해야 한다.
+
+### 2 . History API
+
+브라우저에서 사용자가 사이트에서 이동한 정보를 담고 있는 API 이다.
+
+### 3 . Canvas API
+
+JS와 HTML `<canvas>` Element를 통해 그래픽을 그리기 위한 수단을 제공해준다.
+
+굉장히 광범위한 2D 그래픽을 제공한다.
+
+<br>
+
+## 31. 폴리필
+
+---
+
+<br>
+
+트랜스 파일링 환경에서 개발이 진행도니다.
+
+기본적으로 브라우저에서 지원하지 않는 자바스크립트 기능을 지원할 수 있는 코드로 변환하는 일을 하는게 Babel이다.
+
+그런데 어떻게 이것이 가능할까요 ?
+
+바로 기존의 자바스크립트코드로 상위의 자바스크립트 코드의 기능을 대신 구현하는 것이다.
+
+이러한 개념을 바로 폴리필이라고 한다.
+
+예를 들어 map이라는 함수를 지원하지 않는 브라우저에서도 동작할 수 있도록 직접 map 함수를 구현해보자.
+
+```js
+Array.prototype.MyMap = function (cb) {
+  let arr = [];
+
+  for (let i = 0; i < this.length; i++) {
+    arr.push(cb(this[i]));
+  }
+  return arr;
+};
+
+const a = [1, 2, 3, 4].MyMap(n => n * 2);
+console.log(a); // [2,4,6,8]
+```
+
+<br>
+
+## 32. 형태의 변환 - 객체를 문자열로 변환하기
+
+---
+
+<br>
+
+### 원시적인 방법
+
+배열과 관련된 메소드들이 나오기 전에는 for문을 이용해서 처리를 해주었다.
+
+```js
+const cartItems = [
+  { id: 1, item: '핸드밀', price: 40000, discount: 0 },
+  { id: 2, item: 'A4용지', price: 4000, discount: 0 },
+  { id: 3, item: '수영복', price: 120000, discount: 0 },
+  { id: 4, item: '색연필72색', price: 140000, discount: 0 },
+];
+
+const cartItemArray = [];
+
+for (const obj of cartItems) {
+  const row = [];
+  for (const [, value] of Object.entries(obj)) {
+    row.push(String(value));
+  }
+  cartItemArray.push(row.join());
+}
+
+console.log(cartItemsArray.join('===')); // '1,핸드밀,40000,0===2,A4용지,4000,0===...'
+```
+
+이렇게 이중 for문을 사용해서 객체들을 하나의 문자열로 변환해주었다.
+
+### Object.entries(obj)
+
+Object의 entries 메소드는 인자로 전달받은 객체에 접근해서 각 요소를 [[key,value],...] 형태로 변경해준다.
+
+위 코드를 예로 들자면 `[['id',1],['item','핸드밀'],['price',40000],['discound',0]]`로 변경이 된다.
+
+### 배열 메소드를 이용한 방법
+
+```js
+const extractValueInObject = obj => Object.entries(obj).map(([, value]) => String(value));
+
+const cartItemsString = cartItems.map(extractValueInObject).join('===');
+```
+
+이렇게 배열 메소드를 활용하면 더 직관적인 코드를 작성할 수 있다.
+
+map을 이용해 새로운 배열을 만들어내고 join을 통해서 하나의 문자열로 만들어줬다.
+
+<br>
+
+## 33. 형태의 변환 - 문자열을 형태가 다른 문자열로 변환하기
+
+---
+
+<br>
+
+### 배열 연산을 이용한 코드
+
+```js
+const simpleCamel = (name, splitter = ' ') =>
+  name
+    .split(splitter)
+    .map((word, wi) =>
+      word
+        .split('')
+        .map((char, ci) => (wi > 0 && ci === 0 ? char.toUpperCase() : char.toLowerCase()))
+        .join('')
+    )
+    .join('');
+
+const camelName = simpleCamel('MOON SEOK HWAN');
+console.log(camelName); // 'moonSeokHwan'
+```
+
+### 반복문을 이용한 코드
+
+```js
+const convertCamelName = name => {
+  let camelName = '';
+
+  for (let i = 0, newSpace = false; i < name.length; i++) {
+    if (name[i] === ' ') {
+      newSpace = true;
+      continue;
+    }
+
+    if (newSpace) {
+      camelName = camelName + name[i].toUpperCase();
+      newSpace = false;
+    } else {
+      camelName = camelName + name[i].toLowerCase();
+    }
+  }
+
+  return camelName;
+};
+
+const camelName = convertCamelName('moon seok hwan');
+console.log(camelName); // 'moonSeokHwan'
+```
+
+> 어떤 방법이 더 좋고 나쁘다 이런 건 없고 스타일의 차이이니 둘 다 연습해두자.
+
+<br>
+
+## 34. 형태의 변환 - 문자열 변환 고급 기법 - 템플릿
+
+---
+
+<br>
+
+### Template Literal
+
+템플릿 리터럴은 ES6에서 도입된 문자열 표기법이다.
+
+문자열 생성시 따옴표 대신, 백틱(`)을 사용한다.
+
+이를 사용하게 되면 문자열에 ${}을 사용해 쉽게 데이터(값)을 추가해줄 수 있다.
+
+${} 안에는 최종적으로 값이 될 수 있으면 되므로 변수,함수,객체,배열 등을 전달 할 수 있다.
+
+```js
+const person = {
+  name: 'moon',
+  age: 26,
+};
+
+console.log(`Hi, my name is ${person.name}!`);
+console.log(`Hi, my age is ${person.age}!`);
+```
+
+### Tagged Template Literal
+
+이 템플릿 리터럴을 활용한 Tagged Template Literal 문법이 있다.
+
+이 문법은 직접 구현해서 사용하는 경우는 흔치 않지만 이미 여러 라이브러리에서 활용하고 있어 쉽게 접할 수 있다.
+
+Tagged Template Literal은 함수 형태로 사용할 수 있다.
+
+함수 형태로 전달 되며 2개의 파라미터를 가지는데 정적 데이터 배열과 동적 데이터 배열이다.
+
+아래 코드를 보면서 이해해보자.
+
+```js
+const div = (strings, ...fns) => {
+  const flat = s => s.split('\n').join('');
+  return function (props) {
+    return `<div style="${
+      flat(strings[0]) +
+      (fns[0] && fns[0](props)) +
+      flat(strings[1]) +
+      (fns[1] && fns[1](props)) +
+      flat(strings[2])
+    }"></div>`;
+  };
+};
+
+// div라는 함수에 ()로 인자를 넣는게 아니고 ``을 이용한다.
+
+const Div = div`
+  font-size:30px;
+  color:${props => (props.active ? 'white' : 'gray')}
+  border:none;
+  background-color:${props => (props.active ? 'red' : 'blue')}
+  font-family:700;
+`;
+
+console.log(Div({ active: true }));
+```
+
+### 두개의 파라미터
+
+두개의 파라미터가 전달 되는데 첫번째 파라미터는 ``안의 문자열을 ${}을 기준으로 자른 배열이 들어오고
+
+두번째 파라미터는 ${}로 전달된 값이 배열로 만들어져 들어온다.
+
+즉 위 코드에서 `console.log(strings);`을 하면 `['\n font-size:30px;\n color:', '\n border:none;\n background-color:', '\n font-family:700;\n']`가 출력되고
+
+`console.log(fns);`을 하면 `[ [Function], [Function] ]`이 출력된다.
+
+이렇게 전달되는 값을 활용해서 굉장히 파워풀한 동작을 하는 함수를 만들었다.
+
+props로 전달되는 객체 active의 값에 따라 css가 변경되는 것을 볼 수 있다.
+
+### Styled-components
+
+우리가 Tagged Template Literal을 직접 구현해서 사용하는 경우는 거의 없을 테지만 우리는 이미 많은 라이브러리에서 이를 접할 수 있었다.
+
+대표적으로 Styled-components에서 사용 하고 있다.
+
+```js
+const Header = styled.div`
+  width: 1200px;
+  height: 100px;
+  ${props =>
+    props.primary &&
+    css`
+      background: white;
+      color: black;
+    `}
+`;
+```
+
+Tagged Template Literal을 알고난 후에 이 코드를 보면 어떻게 동작하는지에 대해서 예상 해볼 수 있다.
+
+styled에 div라는 메소드가 있고 이 메소드도 파라미터로 정적 데이터 배열과 동적 데이터 배열을 가질 것이다.
+
+정적 데이터 배열에는 `['\n width:1200px;\n height:100px;']`이 들어있고
+
+동적 데이터 베열에는 `[ [Function] ]`이 들어 있을 것이다.
+
+따라서 Header Component를 생성할 때 props로 어떤 테마를 전달 받느냐에 따라 다른 css를 전달해 줄 수 있다.
+
+<br>
+
+## 35. 형태의 변환 - 객체를 형태가 다른 객체로 변환하기
+
+---
+
+<br>
+
+sourceGroup의 기존 객체를 targetGroup과 같은 구조의 객체로 변환해보자.
+
+## 이 코드를 이해하기 위해서는 map,reduce와 같이 배열 연산자를 많이 사용해보고 익숙해져야 할 것같다
+
+```js
+const sourceGroup = {
+  a: 1,
+  b: 2,
+  c: 3,
+  d: 4,
+  e: 5,
+};
+
+const targetGroup = {
+  aGroup: {
+    a: 1,
+    b: 2,
+  },
+  bGroup: {
+    c: 3,
+    d: 4,
+    e: 5,
+  },
+};
+
+const groupInfo = {
+  aGroup: ['a', 'b'],
+  bGroup: ['c', 'd', 'e'],
+};
+
+function makeGroup(source, info) {
+  const merge = (a, b) => ({ ...a, ...b });
+  return Object.keys(info)
+    .map(group => ({
+      [group]: info[group].map(k => ({ [k]: source[k] })).reduce(merge, {}),
+    }))
+    .reduce(merge, {});
+}
+
+console.log(makeGroup(sourceGroup, groupInfo));
+```
+
+### 위 코드에 대해 알아보자
+
+- `Object.keys(obj)` : 전달 받은 객체의 key들을 각각 문자열로 변환해 배열에 담아주는 헬퍼 함수이다.
+- computed property의 사용 : 객체를 생성할 때 속성을 문자열로 만들기 위한 방법이다.
+- `{['a'] :1}` = `{a:1}`
+- map과 computed property를 활용해 객체를 만들고 해당 객체를 요소로 하는 배열을 만들었다.
+- reduce를 이용해 각 요소가 객체인 배열을 하나의 객체로 변환
+
+<br>
+
+## 36. 형태의 변환 - 문자열을 객체로 변환하기
+
+---
+
+<br>
+
+Template Literal을 이용해 문자열로 DB를 만들었고 이를 객체로 바꿔보고자 한다.
+
+```js
+const movieData = `Title,Release,Ticketing Rate,Director
+보헤미안 랩소디,2018.10.31,11.5%,브라이언 싱어
+완벽한 타인,2018.10.31,4.6%,이재규
+동네사람들,2018.11.07,0.5%,임진순`;
+```
+
+위와 같은 소스 코드를 생성자로 받는 HeaderListData 클래스와 이를 상속 받는 MakeObject 클래스를 만들 것이다.
+
+여기서 HeaderListData는 문자열을 배열로 바꾸는 것에 중점을 뒀고 MakeObject에서 해당 배열을 객체로 바꿔준다.
+
+```js
+class HeaderListData {
+  constructor(source, separator = ',') {
+    const rawData = source.split('\n');
+    this.headers = rawData[0].split(separator);
+    this.rows = rawData.filter((row, index) => index > 0).map(row => row.split(separator));
+  }
+  row = index => this.rows[index].map((row, index) => [this.headers[index], row]);
+
+  get length() {
+    return this.rows.length;
+  }
+
+  get columnLength() {
+    return this.headers.length;
+  }
+}
+
+class MakeObject extends HeaderListData {
+  toObject = index => this.row(index).reduce((a, [key, value]) => ({ ...a, [key]: value }), {});
+
+  toAllObject = () =>
+    Array(this.length)
+      .fill(0)
+      .map((row, index) => this.toObject(index));
+}
+
+const movieData = `Title,Release,Ticketing Rate,Director
+보헤미안 랩소디,2018.10.31,11.5%,브라이언 싱어
+완벽한 타인,2018.10.31,4.6%,이재규
+동네사람들,2018.11.07,0.5%,임진순`;
+
+const movieList = new MakeObject(movieData);
+
+console.log(movieList.toAllObject());
+// 0: {Title: '보헤미안 랩소디', Release: '2018.10.31', Ticketing Rate: '11.5%', Director: '브라이언 싱어'}
+// 1: {Title: '완벽한 타인', Release: '2018.10.31', Ticketing Rate: '4.6%', Director: '이재규'}
+// 2: {Title: '동네사람들', Release: '2018.11.07', Ticketing Rate: '0.5%', Director: '임진순'}
+```
+
+### 문자열에서 사용하는 split 메소드
+
+split 메소드는 문자열을 분할하여 배열로 변환하는 메소드이다.
+
+> 문법
+
+`string.split(separator,limit)`
+
+separator에는 구분자를 넣어주고 limit은 최대 분할 개수를 넣어준다.
+
+단, 둘 다 필수적으로 넣어줘야하는 인자는 아니다.
+
+limit을 넣어주지 않게 되면 모두 분할 해버리고 separator을 넘겨주지 않으면 분할하지 않는다.
+
+```js
+// 아무 인자도 전달하지 않는 경우
+const name = '문 석 환';
+console.log(name.split()); // ['문 석 환']
+
+// 구분자를 전달하는 경우이며 현재 문자열이 공백으로 구분되어져 있으므로 구분자로 ' '을 넣어준다.
+console.log(name.split(' ')); // ['문','석','환']
+
+// 구분자와 limit을 넣는 경우
+console.log(name.split(' ', 1)); // ['문']
+```
+
+### for문 대신 사용하는 테크닉
+
+위 코드에서 toAllObject 메소드를 보면 궁극적인 목적은 배열의 각 요소를 순회하면서 객체로 변환해주는 것이 목적이다.
+
+그러면 반복문이 제일 먼저 떠오르고 물론 위 코드를 for문으로 변경해주고 변경한 객체를 새로만든 배열에 push해주는 방법도 가능하다.
+
+코드를 작성하는 것은 정답이 없고 자기의 스타일대로 더 가독성이 좋은 방법으로 코드를 진행하면 된다.
+
+그래서 선택한 방법은 빈 배열을 만들어주고 map 메소드를 통해 순회하는 방법이다.
+
+`Array(this.length)`를 통해 empty요소 3개를 가진 배열을 만들었다.
+
+그러나 empty요소라 map을 사용할 수 없었고 때문에 `Array.prototype.fill()` 메소드를 사용해 각 요소에 0을 넣어줬다.
+
+이렇게 하나의 기능을 구현하는 것도 여러가지 방법으로 구현해보는 연습을 하면 나만의 코딩 스타일을 확정하는데도 도움이 되고 실력 향상에도 도움이 될꺼 같다.
+
+<br>
+
+## 37. 형태의 변환 - 객체의 병합(Merge)
+
+---
+
+<br>
+
+객체는 참조용이기 때문에 객체가 이동할 때 원본 데이터가 그대로 다른 데이터로 만들어지는 것이 아니고
+
+원본 데이터의 위치 값만 이동하기 때문에 실제로 복사된 것 같지만 복사되지 않고
+
+복사된 객체의 데이터를 변경했더니 원본 데이터까지 변경이 되는 버그를 마주할 수 있다.
+
+따라서 이러한 메커니즘을 잘 이해하며 객체를 병합해야한다.
+
+먼저 깊은 복사와 얕은 복사에 대해 알아보자
+
+### 깊은 복사 & 얕은 복사
+
+깊은 복사와 얕은 복사는 원본 객체와의 연결을 끊고 새로운 객체를 만들어 낸다는 것은 동일하지만 범위가 다르다.
+
+깊은 복사는 원본의 depth에 상관없이 원본과의 연결을 끊고 새롭게 만들어내지만
+
+얕은 복사는 원본의 1depth 까지만 원본과의 연결을 끊은 객체를 만들고 2depth 부터는 참조가 이루어진다.
+
+아래의 깊은 복사 하는 테크닉과 얕은 복사 하는 테크닉을 보면서 이해해보자.
+
+얕은 복사
+
+- Object.assign(copyObj,targetObj)
+- Spread Operator {...obj}
+
+깊은 복사
+
+- JSON 문자열로 변경해줬다가 다시 객체로 변환해주는 테크닉
+- 깊은복사 함수를 직접 구현하는 방법
+
+```js
+function toCloneObject(obj) {
+  let clone = {};
+
+  for (let key in obj) {
+    // key = a,b
+    if (typeof obj[key] === 'object' && obj[key] !== null) {
+      clone[key] = toCloneObject(obj[key]);
+      // clone['b'] = toCloneObject({c:1}) -> clone['c'] = obj['c'] -> {c:1} -> b:{c:1}
+    } else {
+      clone[key] = obj[key];
+      // clone['a'] = obj['a'] -> clone = {a:1}
+    }
+  }
+  return clone; // {a:1,b:{c:1}}
+}
+```
+
+### 객체의 병합
+
+1. 기존의 객체의 속성을 그대로 가져가고 몇가지 속성만 덮어씌워 주는 패턴
+
+```js
+const person = {
+  name: 'moon',
+  home: {
+    address: '부산시 동구',
+    addNumber: 48804,
+  },
+};
+
+const newObject = {
+  ...toCloneObject(person),
+  home: {
+    addNumber: 49902,
+  },
+};
+
+console.log(newObject); // {name:'moon',home:{address:'부산시 동구',addNumber:49902}}
+```
+
+2. DefaultStyle을 만들고 해당 기본스타일을 가지는 css 속성 객체를 새로 만드는 패턴
+
+```js
+const defaultStyle = {
+  color: '#fff',
+  fontSize: 14,
+  fontWeight: 500,
+};
+
+function createParagraph(config) {
+  config = { ...defaultStyle, ...config };
+  return config;
+}
+
+const newObject = createParagraph({ fontSize: 16 });
+
+console.log(newObject); // {color:'#fff',fontSize:16,fontWeight:500}
+```
+
+<br>
+
+## 38. 도구 - Chrome Debugger
+
+---
+
+<br>
+
+Chrome Debugger을 이용하는 방법에 대해서 알아보자.
+
+Chrome Debugger 익스텐션은 미리 설치가 되어있어야 한다.
+
+설정해줘야 하는 json파일이 2가지 존재한다.
+
+- `.vscode/launch.json`
+- `.vscode/tasks.json`
+
+```json
+// launch.json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "pwa-chrome",
+      "request": "launch",
+      "name": "Debug App",
+      "preLaunchTask": "parcel webapp", // 연결할 task 이름
+      "url": "http://localhost:1234", // index.html이 로드되는 url
+      "webRoot": "${workspaceFolder}/dist" // parcel.js를 이용해 빌드되기 때문에 dist와 연결해준다.
+    }
+  ]
+}
+```
+
+```json
+// tasks.json
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "parcel webapp", // 해당 task의 이름 (launch에서 연결해줄 이름임)
+      "type": "shell", // 터미널 사용
+      "command": "parcel index.html", // 이 task가 할 명령어
+      "isBackground": true
+    }
+  ]
+}
+```
+
+<br>
+
+## 39. 도구 - RESTFUL
+
+---
+
+<br>
+
+## HTTP
+
+HTML 문서와 같은 리소스들을 가져올 수 있도록 해주는 프로토콜이다.
+
+### HTTP는 상태가 없지만, 세션은 있습니다
+
+HTTP는 비동기 프로토콜 기반이기 때문에 상태가 없습니다.
+
+따라서 로그인 API에 아이디,비밀번호를 전달해줬지만 특별한 처리를 해주지 않으면
+
+다음 페이지에 갔을 때 로그인 했다는 정보를 기억하지 못한다.
+
+요청이 오면 요청을 응답하고 연결을 바로 끊어버린다.
+
+## REST API
+
+4개의 HTTP 동사와 url을 가지고 어떠한 의미를 만들어내는 프로토콜이 REST API이다.
+
+### HTTP methods
+
+- GET
+- POST
+- PUT
+- DELETE
+
+## Reference
+
+- <https://axios-http.com>
+- <https://randomuser.me/api>
+
+- <https://postcode.map.daum.net/guide>
+- <https://www.slideshare.net/ibare/ss-39274621>
+- <https://regexr.com>
+
+- <https://dev.to/kaykaycodes/7-days-of-css-graphics-and-animations-15e4>
+- <https://codepen.io/towc/pen/mJzOWJ>
+- <https://webglsamples.org/field/field.html>
+- <https://docs.npmjs.com/about-semantic-versioning>
+- <https://rollupjs.org/guide/en/>
+- <https://git-scm.com/book/ko/v2/Git-%EB%8F%84%EA%B5%AC-%EC%84%9C%EB%B8%8C%EB%AA%A8%EB%93%88>
+
+- <https://www.typescriptlang.org/docs/handbook/interfaces.html>
+- <https://www.typescriptlang.org/docs/handbook/2/everyday-types.html>
+- <https://www.typescriptlang.org/docs/handbook/2/types-from-types.html>

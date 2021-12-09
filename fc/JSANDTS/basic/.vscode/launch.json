@@ -7,9 +7,9 @@
     {
       "type": "pwa-chrome",
       "request": "launch",
-      "name": "Launch Chrome against localhost",
+      "name": "Debug App",
       "url": "http://localhost:1234",
-      "webRoot": "${workspaceFolder}"
+      "webRoot": "${workspaceFolder}/dist"
     }
   ]
 }

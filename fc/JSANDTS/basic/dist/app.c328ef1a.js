@@ -118,33 +118,63 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 
   return newRequire;
 })({"app.js":[function(require,module,exports) {
-function doException() {
-  throw new Error("와! 오류야!");
-}
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
 
-function noException() {
-  return true;
-}
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-function callException(type) {
-  if (type === "do") {
-    doException();
-  } else {
-    noException();
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function toCloneObject(obj) {
+  var clone = {};
+
+  for (var key in obj) {
+    if (_typeof(key) === 'object' && obj[key] !== null) {
+      clone[key] = toCloneObject(obj[key]);
+    } else {
+      clone[key] = obj[key];
+    }
   }
-} // function main() {
-//   try {
-//     callException("do");
-//   } catch (e) {
-//     console.log(e);
-//   } finally {
-//     // 예외가 일어나든 안일어나든 반드시 실행되어야 할 코드가 작성되어야함
-//     console.log("done");
-//   }
-// }
 
+  return clone;
+}
 
-doException();
+var store = {
+  user: null,
+  cart: [],
+  config: {
+    multiDevice: false,
+    lastLoginDate: 'Wed Jun 09 2021 20:46:55 GMT+0900'
+  }
+};
+
+var newObject = _objectSpread(_objectSpread({}, toCloneObject(store)), {}, {
+  config: _objectSpread(_objectSpread({}, store.config), {}, {
+    lastLoginDate: new Date()
+  })
+});
+
+console.log(newObject);
+store.config.multiDevice = true;
+console.log(store.config.multiDevice);
+console.log(newObject.config.multiDevice);
+var defaultStyle = {
+  color: '#fff',
+  fontColor: '#999',
+  fontSize: 14,
+  fontWeight: 200
+};
+
+function createParagraph(config) {
+  config = _objectSpread(_objectSpread({}, defaultStyle), config);
+  return config;
+}
+
+var newObj = createParagraph({
+  fontSize: 16
+});
+console.log(newObj);
 },{}],"../../../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -173,7 +203,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49961" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56583" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

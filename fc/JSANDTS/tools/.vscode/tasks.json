@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "parcel webapp", // 어떤 task인지 설명 적는 곳
+      "type": "shell", // command로 실행할 어플리케이션의 종류 , 우리는 터미널에서 사용하니깐 shell
+      "command": "parcel index.html", // 이 task의 실제 명령값
+      "isBackground": false // VS 코드에서 작업이 중단없이 이 번들링을 백그라운드에 켜놓고 계속해서 사용 가능
+    }
+  ]
+}
